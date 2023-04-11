@@ -68,7 +68,12 @@ public class Player : MonoBehaviour
         {
             Move();
             Jump();
-            PlayerSpeed();  
+            PlayerSpeed();
+            playerAnim.SetBool("attack", false);
+            if (Input.GetMouseButtonDown(0))
+            {
+                playerAnim.SetBool("attack", true);
+            }
         }
     }
 
@@ -193,7 +198,7 @@ public class Player : MonoBehaviour
         //movementの符号取得
         float sign = Mathf.Sign(movement);
 
-        characterDirection = new Vector2(sign * 0.1f, 0.1f);
+        characterDirection = new Vector2(-sign * 0.1f, 0.1f);
         if (movement != 0) { gameObject.transform.localScale = characterDirection; } //動いていないとき(movement = 0)は右向きになってしまうので反映しない
 
         //徐々に減速

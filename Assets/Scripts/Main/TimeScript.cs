@@ -11,14 +11,15 @@ public class TimeScript : MonoBehaviour
     public static float elapsedTime;
     public static float playTime = 15;
     public static float startTime = 3f;
+    public float TimeSet;
     float soundTime = 1f;
     bool startFlag;
 
     // Start is called before the first frame update
     void Start()
     {
-        playTime = 5;
-        elapsedTime = 5;
+        playTime = TimeSet;
+        elapsedTime = TimeSet;
         soundTime = 1f;
         startTime = 3f;
         startFlag = true;
