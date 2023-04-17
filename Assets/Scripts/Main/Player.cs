@@ -8,7 +8,7 @@ public class Player : MonoBehaviour
     public Rigidbody2D rbody2D;
     GameObject player;
     //重力
-    float Gravity = 11000;
+    float Gravity = 7000;
     //時間計測用
     float elapsedTime; //ジャンプ時間用
     float wallJumpTime; //壁ジャンプに余裕持たせる
@@ -17,7 +17,7 @@ public class Player : MonoBehaviour
     bool isMoving = false;
 
     //どの種類の壁に触れているか
-    private string judgeWall = "None";
+    public string judgeWall = "None";
     //触れた壁の名前
     string wallName;
 
@@ -26,9 +26,9 @@ public class Player : MonoBehaviour
     //ジャンプ回数
     private float jumpCount = 0;
     //ジャンプ力
-    private float jumpForce = 3.8f;
+    public float jumpForce;
     //プレイヤー移動速度
-    float speed = 50, maxSpeed = 1.7f;
+    public float speed = 50, maxSpeed = 1.2f;
     float movement, stopper = 1.5f, deadZone = 0.1f;
     //プレイヤー速度計測用
     Vector3 latestPos;
@@ -43,9 +43,15 @@ public class Player : MonoBehaviour
 
     //スペースキーの状態
     bool spaceKeyState = false;
+
+    //攻撃
+    [SerializeField] GameObject attackCol;
+    bool whileAttack = false;
+    float attackSign, attackDuration = 1.0f;
     //animation
     [SerializeField]
     private Animator playerAnim;
+    string animeState = "idle";
 
     // Update is called once per frame
     void Start()
@@ -69,11 +75,8 @@ public class Player : MonoBehaviour
             Move();
             Jump();
             PlayerSpeed();
-            playerAnim.SetBool("attack", false);
-            if (Input.GetMouseButtonDown(0))
-            {
-                playerAnim.SetBool("attack", true);
-            }
+            PlayAnim();
+            Attack();
         }
     }
 
@@ -81,30 +84,19 @@ public class Player : MonoBehaviour
     //接触時処理
     private void OnCollisionEnter2D(Collision2D other)
     {
-        //壁または床にぶつかったらジャンプリセット
-        if (other.gameObject.CompareTag("RightWall") || other.gameObject.CompareTag("LeftWall") || other.gameObject.CompareTag("AltWall"))
-        {
-            string colname = other.gameObject.name;
-            judgeWall = colname.Substring(0, colname.Length - 4);
-            //最後にぶつかった壁の名前が当たった壁と違うとき壁ジャンプリセット
-            if (other.gameObject.name != "None")
-            {
-                wallName = other.gameObject.name;
-                jumpCount = 1;
-            }
-        }
-
+       
         if (other.gameObject.CompareTag("Surface"))
         {
-            jumpCount = 0;
-            judgeWall = "None";
             //ジャンプ時間計測(停止)
             if (counter_flag == true)
             {
-                counter_flag = !counter_flag;
+                counter_flag = false;
                 elapsedTime = 0;
             }
-            playerAnim.SetBool("jump", false);
+            if (!isMoving)
+            {
+                animeState = "idle";
+            }
         }
     }
 
@@ -113,10 +105,28 @@ public class Player : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Surface"))
         {
+            judgeWall = "None";
+            wallName = "Surface";
             jumpCount = 0;
             wallflag = false;
 
         }
+        //壁または床にぶつかったらジャンプリセット
+        else if (other.gameObject.CompareTag("RightWall") || other.gameObject.CompareTag("LeftWall") || other.gameObject.CompareTag("AltWall"))
+        {
+            string colname = other.gameObject.name;
+            judgeWall = colname.Substring(0, colname.Length - 4);
+            animeState = "OnWall";
+            //最後にぶつかった壁の名前が当たった壁と違うとき壁ジャンプリセット
+            if(other.gameObject.name != wallName) { jumpCount = 0; }
+            if (other.gameObject.name != "None")
+            {
+                wallName = other.gameObject.name;
+
+            }
+         
+        }
+   
     }
     private void OnCollisionExit2D(Collision2D other)
     {
@@ -130,6 +140,8 @@ public class Player : MonoBehaviour
         {
             //壁ジャンプ可能な時間に余裕持たせる
             wallflag = true;
+            animeState = "jump";
+          
         }
     }
 
@@ -140,9 +152,9 @@ public class Player : MonoBehaviour
         playerspeed = ((playerPos - latestPos) / Time.deltaTime);
         latestPos = playerPos;
         //落下速度調整      
-        if (playerspeed.y < -4f)
+        if (playerspeed.y < -3.5f)
         {
-            rbody2D.velocity = new Vector2(0, -4f);
+            rbody2D.velocity = new Vector2(0, -3.5f);
         }
     }
     void Move()
@@ -160,77 +172,69 @@ public class Player : MonoBehaviour
         
             if (spaceKeyState == false && elapsedTime < maxJumpHeight + 0.1f)
             {
-                if (judgeWall != "None") { rbody2D.velocity = new Vector2(0, -0.8f);   }               
+                if (judgeWall != "None") { rbody2D.velocity = new Vector2(0, -0.5f);   }               
             }
 
             if (jumpCount < 1 && judgeWall == "None")//アニメーション
             {
-                playerAnim.SetBool("run", true);
+                animeState = "run";
             }
             isMoving = true;
+            if (!whileAttack)
+            {
+                Vector2 direction = new Vector2(0.1f, 0.1f);
+                gameObject.transform.localScale = direction;
+            }
+           
 
         }
-        else if (Input.GetKey(KeyCode.D))
+         else if (Input.GetKey(KeyCode.D))
         {
+
             if (movement < maxSpeed)
             {
                 movement += speed * Time.deltaTime;
             }
 
-            if (spaceKeyState = false && elapsedTime < maxJumpHeight + 0.1f)
+            if (spaceKeyState == false && elapsedTime < maxJumpHeight + 0.1f)
             {
-                if (judgeWall != "None") { rbody2D.velocity = new Vector2(0, -0.8f); }
+                if (judgeWall != "None") { rbody2D.velocity = new Vector2(0, -0.5f); }
             }
 
             if (jumpCount < 1 && judgeWall == "None")//アニメーション
             {
-                playerAnim.SetBool("run", true);
+                animeState = "run";
             }
             isMoving = true;
+            if (!whileAttack)
+            {
+                Vector2 direction = new Vector2(-0.1f, 0.1f);
+                gameObject.transform.localScale = direction;
+            }
         }
 
         if(Input.GetKeyUp(KeyCode.D) || Input.GetKeyUp(KeyCode.A))
         {
             isMoving = false;
+            animeState = "idle";
         }
 
 
-        //movementの符号取得
-        float sign = Mathf.Sign(movement);
-
-        characterDirection = new Vector2(-sign * 0.1f, 0.1f);
-        if (movement != 0) { gameObject.transform.localScale = characterDirection; } //動いていないとき(movement = 0)は右向きになってしまうので反映しない
-
-        //徐々に減速
-        sign *= -1;　//減速なのでmovementの逆の符号を加える
-        if(movement != 0)
-        {
-            if (isMoving) { movement += sign * (stopper * Time.deltaTime); }
-            else { movement += sign * ((stopper * 20) * Time.deltaTime); } //移動キーを離すとさ
-        }
-       
-
-        //デッドゾーン
-        if (-deadZone < movement && movement < deadZone)
-        {
-            movement = 0;
-        }
+        movement = Mathf.Lerp(movement, 0, 20 * Time.deltaTime);
 
         
         //アニメーションOFF
-        if (Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D) || jumpCount >= 1)
+        if (Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D))
         {
-            playerAnim.SetBool("run", false);
+            animeState = "idle";
         }
         position.x += movement * Time.deltaTime;
         transform.position = position;
     }
 
     void Jump()
-    {
-        //ジャンプ
-        //キーが押されたとき&&地面にいるとき
-        if (Input.GetKeyDown(KeyCode.Space) && jumpCount < 1 && judgeWall == "None")
+    {   //地面にいるとき||壁に触れているとき
+        if ((Input.GetKeyDown(KeyCode.Space) && jumpCount < 1 && judgeWall == "None") || (Input.GetKeyDown(KeyCode.Space) && jumpCount < 1 && judgeWall != "None"))
         {
             rbody2D.velocity = new Vector2(0f, jumpForce);
             jumpCount++;
@@ -238,16 +242,7 @@ public class Player : MonoBehaviour
             counter_flag = true;
             spaceKeyState = true;
             //アニメーション
-            playerAnim.SetBool("jump", true);
-        }
-        //壁ジャンプ
-        else if (Input.GetKeyDown(KeyCode.Space) && jumpCount < 2 && judgeWall != "None")
-        {
-            rbody2D.velocity = new Vector2(0f, jumpForce);
-            jumpCount++;
-            //時間計測開始
-            counter_flag = true;
-            spaceKeyState = true;
+            animeState = "jump";
         }
 
         //キーが離されたときジャンプキャンセル
@@ -259,7 +254,7 @@ public class Player : MonoBehaviour
                 //ジャンプ中にキーが離されたときジャンプキャンセル
                 if (elapsedTime <= maxJumpHeight)
                 {
-                    rbody2D.velocity = new Vector2(0, 0);
+                    rbody2D.velocity = new Vector2(0, 0.5f);
                 }
                 //時間計測停止
                 if (counter_flag == true)
@@ -272,7 +267,6 @@ public class Player : MonoBehaviour
                 elapsedTime = 0;
 
             }
-            playerAnim.SetBool("jump", false);
 
         }
         //計測時間の表示
@@ -295,6 +289,49 @@ public class Player : MonoBehaviour
 
     }
 
+    void Attack()　//攻撃処理
+    {
+        Vector2 colPos = this.transform.position;
+        if (Input.GetMouseButtonDown(0) && !(whileAttack))
+        {
+            whileAttack = true;
+            playerAnim.SetTrigger("attack");
+        }
+
+        if (whileAttack)
+        {
+            attackDuration -= Time.deltaTime;
+            maxSpeed = 0.8f;   //攻撃時、移動速度減少
+        }
+        else { maxSpeed = 1.1f; }
+
+        if (attackDuration < 0)
+        {
+            whileAttack = false;
+            animeState = "idle";
+            attackDuration = 1.0f;
+        }
+
+        if (0.15f < attackDuration && attackDuration < 0.43f)   //攻撃の当たり判定ON
+        {
+            attackCol.gameObject.SetActive(true);
+        }
+        else { attackCol.gameObject.SetActive(false); }
+
+        colPos.x += gameObject.transform.localScale.x * -1f;
+        colPos.y -= 0.05f;
+        attackCol.transform.position = colPos;
+
+    }
+
+    void PlayAnim()
+    {
+        playerAnim.SetBool("idle", false);
+        playerAnim.SetBool("run", false);
+        playerAnim.SetBool("jump", false);
+        playerAnim.SetBool("OnWall", false);
+        playerAnim.SetBool(animeState, true);
+    }
 }
 
      

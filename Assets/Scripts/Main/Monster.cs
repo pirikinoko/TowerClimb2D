@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class Monster : MonoBehaviour
 {
-    float Speed = 0.5f;
-    Vector2 characterDirection;
-    Vector2 MonsterPos;
-    Vector2 lscale;
+    float Speed = 0.5f, jumpForce = 5f;
+    Rigidbody2D rb2D;
+    Vector2 characterDirection, MonsterPos, localScale;
+
+    bool onSurface = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -32,21 +33,33 @@ public class Monster : MonoBehaviour
         }
         if (other.gameObject.CompareTag("Wepon"))
         {
-            if (Spear.attacked)
-            {
+
                 GameSystem.score += 15 * GameSystem.combo / 5;
                 GameSystem.combo++;
                 SoundEffect.KirarinTrigger = true;
                 Destroy(this.gameObject);
-            }
-
         }
     }
 
+    void OnCollisionStay2D(Collision2D other)
+    {
+        onSurface = true;
+    }
+
+    void Jump()Å@//ÉWÉÉÉìÉv
+    {
+        if (onSurface)
+        {
+            rb2D.velocity = new Vector2(0, jumpForce);
+            onSurface = false;
+        }
+    }
     void Turn()
     {
         Vector2  characterDirection = gameObject.transform.localScale;
         characterDirection.x *= -1;
         gameObject.transform.localScale = characterDirection; 
     }
+
+
 }
