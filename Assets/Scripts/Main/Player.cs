@@ -7,43 +7,37 @@ public class Player : MonoBehaviour
 {
     public Rigidbody2D rbody2D;
     GameObject player;
-    //重力
+    CapsuleCollider2D col2d;
     float Gravity = 7000;
+    //デバッグ用テキスト
+    public Text DebugText;
+    //初期位置を入れておく用のpos
+    public Vector2 defaultPos;
     //時間計測用
     float elapsedTime; //ジャンプ時間用
     float wallJumpTime; //壁ジャンプに余裕持たせる
     bool wallflag = false;
     bool counter_flag = false;
     bool isMoving = false;
-
-    //どの種類の壁に触れているか
+    //壁判定
     public string judgeWall = "None";
-    //触れた壁の名前
     string wallName;
-
-    //ジャンプ最大値の秒数
+    //ジャンプ
     float maxJumpHeight = 0.34f;
-    //ジャンプ回数
     private float jumpCount = 0;
-    //ジャンプ力
     public float jumpForce;
-    //プレイヤー移動速度
+    bool spaceKeyState = false;
+    //移動
     public float speed = 50, maxSpeed = 1.2f;
     float movement, stopper = 1.5f, deadZone = 0.1f;
-    //プレイヤー速度計測用
     Vector3 latestPos;
     Vector2 playerspeed;
-    Vector3 playerPos; //プレイヤー位置
-    //デバッグ用テキスト
-    public Text DebugText;
-    //初期位置を入れておく用のpos
-    public Vector2 defaultPos;
-    //キャラクター向き
+    Vector3 playerPos;
     public static Vector2 characterDirection;
-
-    //スペースキーの状態
-    bool spaceKeyState = false;
-
+    //スライディング
+    bool slideFrag = false;
+    float slideDuration;
+    public bool onGround { get; set; }
     //攻撃
     [SerializeField] GameObject attackCol;
     bool whileAttack = false;
@@ -52,12 +46,12 @@ public class Player : MonoBehaviour
     [SerializeField]
     private Animator playerAnim;
     string animeState = "idle";
-
     // Update is called once per frame
     void Start()
     {
         movement = 0;
         player = this.gameObject;
+        col2d = this.GetComponent<CapsuleCollider2D>();
         //Rigidbodyを取得
         rbody2D = GetComponent<Rigidbody2D>();
         //初期位置の保存
@@ -74,10 +68,12 @@ public class Player : MonoBehaviour
         {
             Move();
             Jump();
+            Slide();
             PlayerSpeed();
             PlayAnim();
             Attack();
         }
+        DebugText.text = maxSpeed.ToString();
     }
 
 
@@ -109,7 +105,7 @@ public class Player : MonoBehaviour
             wallName = "Surface";
             jumpCount = 0;
             wallflag = false;
-
+            onGround = true;
         }
         //壁または床にぶつかったらジャンプリセット
         else if (other.gameObject.CompareTag("RightWall") || other.gameObject.CompareTag("LeftWall") || other.gameObject.CompareTag("AltWall"))
@@ -134,6 +130,7 @@ public class Player : MonoBehaviour
         if (other.gameObject.CompareTag("Surface"))
         {
             jumpCount = 1;
+            onGround = false;
         }
         //壁から離れたとき床に触れた判定にする
         if (other.gameObject.CompareTag("RightWall") || other.gameObject.CompareTag("LeftWall") || other.gameObject.CompareTag("AltWall"))
@@ -161,26 +158,33 @@ public class Player : MonoBehaviour
     {
         //プレイヤーの位置を取得
         Vector2 position = transform.position;
-
+        if (slideFrag)
+        {
+            maxSpeed = 1.8f;
+        }
+        else if (whileAttack)
+        {
+            maxSpeed = 0.8f;
+        }
+        else
+        {
+            maxSpeed = 1.2f;
+        }
         //ADキーで移動
         if (Input.GetKey(KeyCode.A))
         {
-            if (movement > -maxSpeed)
-            {
-                movement -= speed * Time.deltaTime;
-            }
-        
+            movement -= speed * Time.deltaTime;
             if (spaceKeyState == false && elapsedTime < maxJumpHeight + 0.1f)
             {
                 if (judgeWall != "None") { rbody2D.velocity = new Vector2(0, -0.5f);   }               
             }
 
-            if (jumpCount < 1 && judgeWall == "None")//アニメーション
+            if (jumpCount < 1 && judgeWall == "None" && !(slideFrag))//アニメーション
             {
                 animeState = "run";
             }
             isMoving = true;
-            if (!whileAttack)
+            if (!whileAttack && !slideFrag)
             {
                 Vector2 direction = new Vector2(0.1f, 0.1f);
                 gameObject.transform.localScale = direction;
@@ -190,23 +194,18 @@ public class Player : MonoBehaviour
         }
          else if (Input.GetKey(KeyCode.D))
         {
-
-            if (movement < maxSpeed)
-            {
-                movement += speed * Time.deltaTime;
-            }
-
+            movement += speed * Time.deltaTime;
             if (spaceKeyState == false && elapsedTime < maxJumpHeight + 0.1f)
             {
                 if (judgeWall != "None") { rbody2D.velocity = new Vector2(0, -0.5f); }
             }
 
-            if (jumpCount < 1 && judgeWall == "None")//アニメーション
+            if (jumpCount < 1 && judgeWall == "None" && !(slideFrag))//アニメーション
             {
                 animeState = "run";
             }
             isMoving = true;
-            if (!whileAttack)
+            if (!whileAttack && !slideFrag)
             {
                 Vector2 direction = new Vector2(-0.1f, 0.1f);
                 gameObject.transform.localScale = direction;
@@ -219,7 +218,8 @@ public class Player : MonoBehaviour
             animeState = "idle";
         }
 
-
+        movement = Mathf.Max(movement, -maxSpeed);
+        movement = Mathf.Min(movement, maxSpeed);
         movement = Mathf.Lerp(movement, 0, 20 * Time.deltaTime);
 
         
@@ -301,9 +301,8 @@ public class Player : MonoBehaviour
         if (whileAttack)
         {
             attackDuration -= Time.deltaTime;
-            maxSpeed = 0.8f;   //攻撃時、移動速度減少
         }
-        else { maxSpeed = 1.1f; }
+
 
         if (attackDuration < 0)
         {
@@ -324,12 +323,36 @@ public class Player : MonoBehaviour
 
     }
 
+    void Slide()
+    {
+        if (onGround && Input.GetKeyDown(KeyCode.LeftControl))
+        {      
+            slideFrag = true;
+        }
+        if (slideFrag)
+        {
+            animeState = "sliding";
+            movement *= 2;
+            slideDuration += Time.deltaTime;
+            col2d.size = new Vector2(1, 1.8f);
+            col2d.offset = new Vector2(0.04f, -0.45f);
+            if (slideDuration > 0.5f)
+            {
+                slideDuration = 0;
+                col2d.size = new Vector2(1, 2.7f);
+                col2d.offset = new Vector2(0.04f, 0.1f);
+                slideFrag = false;
+                animeState = "idle";
+            }
+        }
+    }
     void PlayAnim()
     {
         playerAnim.SetBool("idle", false);
         playerAnim.SetBool("run", false);
         playerAnim.SetBool("jump", false);
         playerAnim.SetBool("OnWall", false);
+        playerAnim.SetBool("sliding", false);
         playerAnim.SetBool(animeState, true);
     }
 }
