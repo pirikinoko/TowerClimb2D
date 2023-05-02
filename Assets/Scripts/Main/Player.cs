@@ -8,6 +8,7 @@ public class Player : MonoBehaviour
     public Rigidbody2D rbody2D;
     GameObject player;
     CapsuleCollider2D col2d;
+    BoxCollider2D legCol2d;
     float Gravity = 7000;
     //デバッグ用テキスト
     public Text DebugText;
@@ -22,6 +23,7 @@ public class Player : MonoBehaviour
     //壁判定
     public string judgeWall = "None";
     string wallName;
+    bool onWall;
     //ジャンプ
     float maxJumpHeight = 0.34f;
     private float jumpCount = 0;
@@ -52,6 +54,7 @@ public class Player : MonoBehaviour
         movement = 0;
         player = this.gameObject;
         col2d = this.GetComponent<CapsuleCollider2D>();
+        legCol2d = transform.GetChild(0).gameObject.GetComponent<BoxCollider2D>();
         //Rigidbodyを取得
         rbody2D = GetComponent<Rigidbody2D>();
         //初期位置の保存
@@ -64,6 +67,8 @@ public class Player : MonoBehaviour
     {
         //重力付与
         rbody2D.AddForce(transform.up * -Gravity * Time.deltaTime);
+        Vector3 legPos = playerPos; legPos.y -= 0.13f;
+        legCol2d.transform.position = legPos;
         if (GameSystem.playable)
         {
             Move();
@@ -73,7 +78,7 @@ public class Player : MonoBehaviour
             PlayAnim();
             Attack();
         }
-        DebugText.text = maxSpeed.ToString();
+        DebugText.text = jumpCount.ToString();
     }
 
 
@@ -94,6 +99,13 @@ public class Player : MonoBehaviour
                 animeState = "idle";
             }
         }
+        if (other.gameObject.CompareTag("RightWall") || other.gameObject.CompareTag("LeftWall") || other.gameObject.CompareTag("AltWall"))
+        {
+            if (!onGround)
+            {
+                onWall = true;
+            }
+        }
     }
 
     //床に触れている間ジャンプカウントリセット
@@ -107,18 +119,16 @@ public class Player : MonoBehaviour
             wallflag = false;
             onGround = true;
         }
-        //壁または床にぶつかったらジャンプリセット
         else if (other.gameObject.CompareTag("RightWall") || other.gameObject.CompareTag("LeftWall") || other.gameObject.CompareTag("AltWall"))
         {
             string colname = other.gameObject.name;
             judgeWall = colname.Substring(0, colname.Length - 4);
             animeState = "OnWall";
             //最後にぶつかった壁の名前が当たった壁と違うとき壁ジャンプリセット
-            if(other.gameObject.name != wallName) { jumpCount = 0; }
+            if (other.gameObject.name != wallName) { jumpCount = 1; }
             if (other.gameObject.name != "None")
             {
                 wallName = other.gameObject.name;
-
             }
          
         }
@@ -132,13 +142,12 @@ public class Player : MonoBehaviour
             jumpCount = 1;
             onGround = false;
         }
-        //壁から離れたとき床に触れた判定にする
+        //壁から離れたとき
         if (other.gameObject.CompareTag("RightWall") || other.gameObject.CompareTag("LeftWall") || other.gameObject.CompareTag("AltWall"))
         {
-            //壁ジャンプ可能な時間に余裕持たせる
             wallflag = true;
+            onWall = false;
             animeState = "jump";
-          
         }
     }
 
@@ -234,13 +243,13 @@ public class Player : MonoBehaviour
 
     void Jump()
     {   //地面にいるとき||壁に触れているとき
-        if ((Input.GetKeyDown(KeyCode.Space) && jumpCount < 1 && judgeWall == "None") || (Input.GetKeyDown(KeyCode.Space) && jumpCount < 1 && judgeWall != "None"))
+        if ((Input.GetKeyDown(KeyCode.Space) && jumpCount == 0 && judgeWall == "None") || (Input.GetKeyDown(KeyCode.Space) && jumpCount == 1 && judgeWall != "None"))
         {
             rbody2D.velocity = new Vector2(0f, jumpForce);
             jumpCount++;
             //時間計測開始
             counter_flag = true;
-            spaceKeyState = true;
+            spaceKeyState = true; 
             //アニメーション
             animeState = "jump";
         }
@@ -325,6 +334,7 @@ public class Player : MonoBehaviour
 
     void Slide()
     {
+        if (whileAttack || !onGround) { return; }
         if (onGround && Input.GetKeyDown(KeyCode.LeftControl))
         {      
             slideFrag = true;
@@ -335,7 +345,7 @@ public class Player : MonoBehaviour
             movement *= 2;
             slideDuration += Time.deltaTime;
             col2d.size = new Vector2(1, 1.8f);
-            col2d.offset = new Vector2(0.04f, -0.45f);
+            //col2d.offset = new Vector2(0.04f, -0.45f);
             if (slideDuration > 0.5f)
             {
                 slideDuration = 0;
