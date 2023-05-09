@@ -5,6 +5,7 @@ using UnityEngine;
 public class Collision : MonoBehaviour
 {
     int count = 0;
+   
     // Start is called before the first frame update
     void Start()
     {
@@ -16,6 +17,7 @@ public class Collision : MonoBehaviour
         {
             if(count == 0)
             {
+              
                 if (this.gameObject.CompareTag("Enemy"))
                 {
                     GameSystem.score -= 5;

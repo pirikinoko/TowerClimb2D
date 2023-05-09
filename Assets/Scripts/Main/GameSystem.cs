@@ -11,7 +11,7 @@ public class GameSystem : MonoBehaviour
     public static int combo;
     int scoreDisplay;
     public static float resultTime, resultScore , score;
-    int stage1Goal = 5;
+    int stage1Goal = 5, lastCombo = 0;
     string rank;
     public static string gameState = "Playing";
     public static bool playable = true;
@@ -25,6 +25,7 @@ public class GameSystem : MonoBehaviour
         resultScore = 0;
         resultTime = 0;
         combo = 0;
+        lastCombo = 0;
         player = GameObject.Find("Player");
         scoreTextGO = GameObject.Find("Score");
         comboTextGO = GameObject.Find("Combo");
@@ -36,7 +37,8 @@ public class GameSystem : MonoBehaviour
     {
         ScoreDisplay();
         Clear();
-        TimeUp();   
+        TimeUp();
+        Effect();
         scoreText.text = scoreDisplay.ToString();
         comboText.text = combo.ToString();
     }
@@ -74,7 +76,6 @@ public class GameSystem : MonoBehaviour
         }
       
     }
-
     void TimeUp()
     {
         if(TimeScript.playTime < 0)
@@ -109,4 +110,31 @@ public class GameSystem : MonoBehaviour
             scoreDisplay ++;
         }
     }
+    void Effect()
+    {
+        if(combo != lastCombo)
+        {
+            StartCoroutine(SizeEffect(comboText)); 
+        }
+        lastCombo = combo;
+    }
+    IEnumerator SizeEffect(Text text)
+    {
+       
+        float originalSize = text.fontSize;
+        float sizeGoal = originalSize * 1.5f;
+        float speed = 5.0f;
+        while(text.fontSize < sizeGoal)
+        {
+            text.fontSize = (int)Mathf.Lerp(text.fontSize, sizeGoal, speed * Time.deltaTime);
+            yield return null;
+        }
+        yield return new WaitForSeconds(0.2f);
+        while (text.fontSize > originalSize)
+        {
+            text.fontSize = (int)Mathf.Lerp(text.fontSize, originalSize, speed * Time.deltaTime);
+            yield return null;
+        }
+    }
 }
+

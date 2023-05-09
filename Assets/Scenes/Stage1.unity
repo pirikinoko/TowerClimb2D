@@ -753,8 +753,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -351, y: -459}
-  m_SizeDelta: {x: 1125.5, y: 171.9}
+  m_AnchoredPosition: {x: -635, y: -463}
+  m_SizeDelta: {x: 1406.5, y: 455.9}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &274654083
 MonoBehaviour:
@@ -783,7 +783,7 @@ MonoBehaviour:
     m_BestFit: 0
     m_MinSize: 0
     m_MaxSize: 300
-    m_Alignment: 0
+    m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
@@ -21935,14 +21935,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rbody2D: {fileID: 679713057}
-  DebugText: {fileID: 1004466033}
-  defaultPos: {x: 0, y: -4.5}
-  judgeWall: None
-  jumpForce: 3
-  speed: 50
-  maxSpeed: 1.1
   attackCol: {fileID: 1390729234}
   playerAnim: {fileID: 1458599075}
+  DebugText: {fileID: 1004466033}
+  defaultPos: {x: 0, y: -4.5}
+  speed: 50
+  maxSpeed: 1.1
+  jumpForce: 3
+  judgeWall: None
+  animeState: idle
+  wallName: 
+  onGround: 0
+  legOnGround: 0
+  wallflag: 0
+  jumpFlag: 0
+  onWall: 0
+  isMoving: 0
+  isAttacking: 0
+  slideFrag: 0
+  spaceKeyState: 0
+  jumpCount: 0
 --- !u!95 &1458599075
 Animator:
   serializedVersion: 3
@@ -24012,13 +24024,14 @@ GameObject:
   - component: {fileID: 2069880525}
   - component: {fileID: 2069880527}
   - component: {fileID: 2069880526}
+  - component: {fileID: 2069880528}
   m_Layer: 0
   m_Name: LegCol
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2069880525
 Transform:
   m_ObjectHideFlags: 0
@@ -24110,6 +24123,18 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &2069880528
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2069880524}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0678b7d536219bb4988d9f08ab48336b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2082931423
 GameObject:
   m_ObjectHideFlags: 0
