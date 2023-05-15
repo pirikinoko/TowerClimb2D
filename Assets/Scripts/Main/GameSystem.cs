@@ -15,7 +15,7 @@ public class GameSystem : MonoBehaviour
     string rank;
     public static string gameState = "Playing";
     public static bool playable = true;
-    Vector2 goalPos; //ゴールした時のプレイヤー位置
+    Vector2 goalPos; //繧ｴ繝ｼ繝ｫ縺励◆譎ゅ�ｮ繝励Ξ繧､繝､繝ｼ菴咲ｽｮ
     // Start is called before the first frame update
     void Start()
     {
@@ -63,8 +63,8 @@ public class GameSystem : MonoBehaviour
             player.transform.position = goalPos;
             int SECount1 = 0;
             int SECount2 = 0;
-            resultTimeTx.text = String.Format("{0:##.#}", resultTime);  //小数点第二位以下を非表示
-            resultScoreTx.text = String.Format("{0:####}", resultScore);  //整数のみ表示
+            resultTimeTx.text = String.Format("{0:##.#}", resultTime);  //蟆乗焚轤ｹ隨ｬ莠御ｽ堺ｻ･荳九ｒ髱櫁｡ｨ遉ｺ
+            resultScoreTx.text = String.Format("{0:####}", resultScore);  //謨ｴ謨ｰ縺ｮ縺ｿ陦ｨ遉ｺ
             if (resultTime < TimeScript.playTime)
             {
                 GainResultTime();

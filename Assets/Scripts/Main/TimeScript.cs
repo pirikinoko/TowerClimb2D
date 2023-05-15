@@ -35,7 +35,7 @@ public class TimeScript : MonoBehaviour
     }
     void TimerStart()
     {
-        //ÉJÉEÉìÉgÉ_ÉEÉì
+        //„Ç´„Ç¶„É≥„Éà„ÉÄ„Ç¶„É≥
         if (startFlag)
         {
             startTime -= Time.deltaTime;
@@ -54,7 +54,7 @@ public class TimeScript : MonoBehaviour
             }
             else if (startTime < 0 && startTime > -0.5f)
             {
-                countDown.text = ("ÉXÉ^Å[Ég");
+                countDown.text = ("„Çπ„Çø„Éº„Éà");
                 GameSystem.playable = true;
             }
             else if (startTime < -0.5f)
@@ -68,7 +68,7 @@ public class TimeScript : MonoBehaviour
                 soundTime = 1;
             }
         }
-        //ÉQÅ[ÉÄÉXÉ^Å[Ég
+        //„Ç≤„Éº„É†„Çπ„Çø„Éº„Éà
         if (startTime < 0)
         {
             if (GameSystem.playable)
@@ -76,7 +76,7 @@ public class TimeScript : MonoBehaviour
                 elapsedTime -= Time.deltaTime;
                 playTime = elapsedTime * 10;
                 playTime = Mathf.Floor(playTime) / 10;
-                timer.text = ("É^ÉCÉÄ:" + playTime);
+                timer.text = ("„Çø„Ç§„É†:" + playTime);
             }
 
         }

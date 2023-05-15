@@ -7,8 +7,8 @@ public class Spear : MonoBehaviour
     GameObject playerGO, spearGO;
     Rigidbody2D spearrbody2D;
     float attackDuration, defaultAD = 0.5f;
-    float angle; //ƒ}ƒEƒXƒ|ƒCƒ“ƒ^[‚ÌŠp“x
-    float spearRot = 0f; //‘„‚ÌŠp“x
+    float angle; //ãƒã‚¦ã‚¹ãƒã‚¤ãƒ³ã‚¿ãƒ¼ã®è§’åº¦
+    float spearRot = 0f; //æ§ã®è§’åº¦
     public static bool clicked, attacked;
     Vector3 playerPos; Vector2 spearGoal, pos, spearColVector;
 
@@ -28,9 +28,9 @@ public class Spear : MonoBehaviour
         playerPos = playerGO.transform.position;
         if (GameSystem.playable)
         {
-            //‘„Šp“xæ“¾
+            //æ§è§’åº¦å–å¾—
             angle = GetAngle(playerGO.transform.position, MousePointer.pointer);
-            // Šp“x”½‰f         
+            // è§’åº¦åæ˜          
             spearrbody2D.MoveRotation(spearRot);
 
             SpearAttack();
@@ -44,7 +44,7 @@ public class Spear : MonoBehaviour
 
     void SpearAttack()
     {
-        //ƒNƒŠƒbƒN‚µ‚½‚©‚Ç‚¤‚©
+        //ã‚¯ãƒªãƒƒã‚¯ã—ãŸã‹ã©ã†ã‹
         if (Input.GetMouseButtonDown(0))
         {
             clicked = true;
@@ -54,19 +54,19 @@ public class Spear : MonoBehaviour
             clicked = false;
         }
 
-        if (clicked && attackDuration == defaultAD)@//ƒNƒŠƒbƒN‚³‚ê‚½‚Æ‚«UŒ‚€”õ‚ª‚Å‚«‚Ä‚¢‚é‚È‚ç
+        if (clicked && attackDuration == defaultAD)ã€€//ã‚¯ãƒªãƒƒã‚¯ã•ã‚ŒãŸã¨ãæ”»æ’ƒæº–å‚™ãŒã§ãã¦ã„ã‚‹ãªã‚‰
         {
             spearColVector = AngleToVector2(angle);
             attacked = true;
         }
 
-        if (attacked)              //UŒ‚‚Ì‘„‚Ì“®‚«
+        if (attacked)              //æ”»æ’ƒæ™‚ã®æ§ã®å‹•ã
         {
             CalcSpearCollision();
             attackDuration -= Time.deltaTime;
         }
 
-        else if (attacked == false)@@@@@@@@@@//”ñUŒ‚‚Ì‘„‚ÌŠp“x
+        else if (attacked == false)ã€€ã€€ã€€ã€€ã€€ã€€ã€€ã€€ã€€ã€€//éæ”»æ’ƒæ™‚ã®æ§ã®è§’åº¦
         {
             if (Player.characterDirection.x == 0)
             {
@@ -79,7 +79,7 @@ public class Spear : MonoBehaviour
             }
         }
 
-        if (attackDuration < 0)@@@@@@@//UŒ‚‚ªI‚í‚Á‚½Œã‚Ìˆ—@
+        if (attackDuration < 0)ã€€ã€€ã€€ã€€ã€€ã€€ã€€//æ”»æ’ƒãŒçµ‚ã‚ã£ãŸå¾Œã®å‡¦ç†ã€€
         {
             attackDuration = defaultAD;
             attacked = false;
@@ -87,7 +87,7 @@ public class Spear : MonoBehaviour
     }
     void SpearRotation()
     {
-        spearrbody2D.MoveRotation(spearRot);  // Šp“x”½‰f 
+        spearrbody2D.MoveRotation(spearRot);  // è§’åº¦åæ˜  
     }
 
     float GetAngle(Vector2 start, Vector2 target)
@@ -104,7 +104,7 @@ public class Spear : MonoBehaviour
         return new Vector2(Mathf.Cos(radian), Mathf.Sin(radian)).normalized;
     }
 
-    void CalcSpearCollision()//‘„‚Ì“–‚½‚è”»’è‚ÌˆÊ’u‚ğŒvZ
+    void CalcSpearCollision()//æ§ã®å½“ãŸã‚Šåˆ¤å®šã®ä½ç½®ã‚’è¨ˆç®—
     {
         Vector2 spearPos = this.transform.position;
         Vector2 playerPos = playerGO.transform.position;

@@ -16,7 +16,7 @@ public class Monster : MonoBehaviour
         MonsterPos = this.transform.position;
     }
 
-    // Update is called once per frame
+    // Update is called once per dadaDadad
     void Update()
     {
         MonsterPos.x += Speed * Time.deltaTime;
@@ -46,7 +46,7 @@ public class Monster : MonoBehaviour
         onSurface = true;
     }
 
-    void Jump()Å@//ÉWÉÉÉìÉv
+    void Jump()„ÄÄ//„Ç∏„É£„É≥„Éó
     {
         if (onSurface)
         {
