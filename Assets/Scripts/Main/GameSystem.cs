@@ -110,31 +110,42 @@ public class GameSystem : MonoBehaviour
             scoreDisplay ++;
         }
     }
+    private Coroutine sizeEffectCoroutine;
     void Effect()
     {
         if(combo != lastCombo)
         {
-            StartCoroutine(SizeEffect(comboText)); 
+          if (sizeEffectCoroutine != null)
+          {
+            // 既に実行中のコルーチンがあれば停止させる
+            StopCoroutine(sizeEffectCoroutine);
+          }
+          StartCoroutine(SizeEffect(comboText)); 
+          lastCombo = combo;
         }
-        lastCombo = combo;
+
     }
-    IEnumerator SizeEffect(Text text)
+ IEnumerator SizeEffect(Text text)
+{
+    float originalSize = text.fontSize;
+    float sizeGoal = originalSize * 1.5f;
+    float speed = 5.0f;
+    while (text.fontSize < sizeGoal)
     {
-       
-        float originalSize = text.fontSize;
-        float sizeGoal = originalSize * 1.5f;
-        float speed = 5.0f;
-        while(text.fontSize < sizeGoal)
-        {
-            text.fontSize = (int)Mathf.Lerp(text.fontSize, sizeGoal, speed * Time.deltaTime);
-            yield return null;
-        }
-        yield return new WaitForSeconds(0.2f);
-        while (text.fontSize > originalSize)
-        {
-            text.fontSize = (int)Mathf.Lerp(text.fontSize, originalSize, speed * Time.deltaTime);
-            yield return null;
-        }
+        text.fontSize = (int)Mathf.Lerp(text.fontSize, sizeGoal + 10, speed * Time.deltaTime);
+        yield return null;
     }
+
+    yield return new WaitForSeconds(0.2f);
+
+    while (text.fontSize > originalSize)
+    {
+        text.fontSize = (int)Mathf.Lerp(text.fontSize, originalSize - 10, speed * Time.deltaTime);
+        yield return null;
+    }
+    sizeEffectCoroutine = null;
+}
+
+
 }
 

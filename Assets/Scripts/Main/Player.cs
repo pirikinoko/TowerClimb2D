@@ -17,7 +17,7 @@ public class Player : MonoBehaviour
     public Vector2 defaultPos;
     public float speed = 50, maxSpeed = 1.2f, jumpForce = 2.5f;
     public string judgeWall = "None";
-    float Gravity = 7000, elapsedTime, wallJumpTime, attackSign, attackDuration = 1.0f, slideDuration, maxJumpHeight = 0.34f, movement, stopper = 1.5f;
+    float Gravity = 7000, elapsedTime, wallJumpTime, attackSign, attackDuration = 1.0f, slideDuration, maxJumpHeight = 0.34f, movement;
     [HideInInspector] public string animeState = "idle", wallName;
     [HideInInspector] public bool onGround, legOnGround,  wallflag = false, jumpFlag = false, onWall, isMoving = false, isAttacking = false, slideFrag = false, spaceKeyState = false;
     [HideInInspector] public int jumpCount = 0;
