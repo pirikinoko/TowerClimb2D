@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Tilemaps;
 
 public class Player : MonoBehaviour
 {
@@ -13,11 +14,12 @@ public class Player : MonoBehaviour
     CapsuleCollider2D col2d;
     BoxCollider2D legCol2d;
     public static Vector2 characterDirection;
+    public Tilemap tilemap;
     public Text DebugText;
     public Vector2 defaultPos;
-    public float speed = 50, maxSpeed = 1.2f, jumpForce = 2.5f;
+    public float  speed = 1.2f, jumpForce = 1.7f;
     public string judgeWall = "None";
-    float Gravity = 7000, elapsedTime, wallJumpTime, attackSign, attackDuration = 1.0f, slideDuration, maxJumpHeight = 0.34f, movement;
+    float Gravity = 6000, elapsedTime, wallJumpTime, attackSign, attackDuration = 1.0f, slideDuration, maxJumpHeight = 0.34f;
     [HideInInspector] public string animeState = "idle", wallName;
     [HideInInspector] public bool onGround, legOnGround,  wallflag = false, jumpFlag = false, onWall, isMoving = false, isAttacking = false, slideFrag = false, spaceKeyState = false;
     [HideInInspector] public int jumpCount = 0;
@@ -26,7 +28,6 @@ public class Player : MonoBehaviour
  
     void Start()
     {
-        movement = 0;
         player = this.gameObject;
         col2d = this.GetComponent<CapsuleCollider2D>();
         legCol2d = transform.GetChild(0).gameObject.GetComponent<BoxCollider2D>();
@@ -46,6 +47,7 @@ public class Player : MonoBehaviour
         legCol2d.transform.position = legPos;
         if (GameSystem.playable)
         {
+            getTiles();
             Move();
             Jump();
             Slide();
@@ -60,7 +62,7 @@ public class Player : MonoBehaviour
     //接触時処理
     private void OnCollisionEnter2D(Collision2D other)
     {
-        if (other.gameObject.CompareTag("RightWall") || other.gameObject.CompareTag("LeftWall") || other.gameObject.CompareTag("AltWall"))
+        if (other.gameObject.CompareTag("Wall"))
         {
             if (!onGround)
             {
@@ -72,7 +74,7 @@ public class Player : MonoBehaviour
     //床に触れている間ジャンプカウントリセット
     private void OnCollisionStay2D(Collision2D other)
     {
-        if (other.gameObject.CompareTag("RightWall") || other.gameObject.CompareTag("LeftWall") || other.gameObject.CompareTag("AltWall"))
+        if (other.gameObject.CompareTag("Wall"))
         {
             string colname = other.gameObject.name;
             judgeWall = colname.Substring(0, colname.Length - 4);
@@ -89,7 +91,6 @@ public class Player : MonoBehaviour
             if (legOnGround)
             {
                 if (isMoving == false && !spaceKeyState) { animeState = "idle"; }
-                jumpFlag = false;
                 judgeWall = "None";
                 wallName = "Surface";
                 jumpCount = 0;
@@ -110,7 +111,7 @@ public class Player : MonoBehaviour
             onGround = false;
         }
         //壁から離れたとき
-        if (other.gameObject.CompareTag("RightWall") || other.gameObject.CompareTag("LeftWall") || other.gameObject.CompareTag("AltWall"))
+        if (other.gameObject.CompareTag("Wall"))
         {
             wallflag = true;
             onWall = false;
@@ -136,20 +137,24 @@ public class Player : MonoBehaviour
         Vector2 position = transform.position;
         if (slideFrag)
         {
-            maxSpeed = 1.8f;
+            speed = 1.3f;
+            Vector2 direction = gameObject.transform.localScale;
+            position.x -= (direction.x * 10) * speed * Time.deltaTime;
+            transform.position = position;
+            return;
         }
         else if (isAttacking)
         {
-            maxSpeed = 0.8f;
+            speed = 0.7f;
         }
         else
         {
-            maxSpeed = 1.2f;
+            speed = 1.0f;
         }
         //ADキーで移動
         if (Input.GetKey(KeyCode.A))
         {
-            movement -= speed * Time.deltaTime;
+            position.x -= speed * Time.deltaTime;
             if (spaceKeyState == false && elapsedTime < maxJumpHeight + 0.1f)
             {
                 if (judgeWall != "None") { rbody2D.velocity = new Vector2(0, -0.5f);   }               
@@ -170,7 +175,7 @@ public class Player : MonoBehaviour
         }
          else if (Input.GetKey(KeyCode.D))
         {
-            movement += speed * Time.deltaTime;
+            position.x += speed * Time.deltaTime;
             if (spaceKeyState == false && elapsedTime < maxJumpHeight + 0.1f)
             {
                 if (judgeWall != "None") { rbody2D.velocity = new Vector2(0, -0.5f); }
@@ -193,12 +198,7 @@ public class Player : MonoBehaviour
             isMoving = false;
             animeState = "idle";
         }
-
-        movement = Mathf.Max(movement, -maxSpeed);
-        movement = Mathf.Min(movement, maxSpeed);
-        movement = Mathf.Lerp(movement, 0, 20 * Time.deltaTime);
-
-        position.x += movement * Time.deltaTime;
+        
         transform.position = position;
     }
 
@@ -208,8 +208,6 @@ public class Player : MonoBehaviour
         {
             rbody2D.velocity = new Vector2(0f, jumpForce);
             jumpCount++;
-            //時間計測開始
-            jumpFlag = true;
             spaceKeyState = true; 
             //アニメーション
             animeState = "jump";
@@ -282,7 +280,6 @@ public class Player : MonoBehaviour
         if (slideFrag)
         {
             animeState = "sliding";
-            movement *= 2;
             slideDuration += Time.deltaTime;
             col2d.size = new Vector2(1, 1.8f);
             if (slideDuration > 0.5f)
@@ -293,6 +290,21 @@ public class Player : MonoBehaviour
                 slideFrag = false;
                 animeState = "idle";
             }
+        }
+    }
+    void getTiles()
+    {
+        // プレイヤーの現在位置を取得
+        Vector3Int playerCellPosition = tilemap.WorldToCell(transform.position);
+        playerCellPosition.y -= 1;
+        // プレイヤーが接触しているタイルを取得
+        TileBase tile = tilemap.GetTile(playerCellPosition);
+
+        if (tile != null)
+        {
+            // タイルが存在する場合、タイルのIDを取得
+            int tileID = tile.GetInstanceID();
+            Debug.Log("Tile ID: " + tileID);
         }
     }
     void PlayAnim()

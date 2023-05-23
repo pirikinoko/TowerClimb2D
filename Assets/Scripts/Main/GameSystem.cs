@@ -36,7 +36,6 @@ public class GameSystem : MonoBehaviour
     void Update()
     {
         ScoreDisplay();
-        Clear();
         TimeUp();
         Effect();
         scoreText.text = scoreDisplay.ToString();
@@ -46,18 +45,10 @@ public class GameSystem : MonoBehaviour
     {
         ShowResult();
     }
-    void Clear()
-    {
-        if (player.transform.position.y > goalLine.transform.position.y)
-        {          
-            playable = false;
-            gameState = "Cleared";
-            goalPos = player.transform.position;
-        }
-    }
+
     void ShowResult()
     {
-        if (gameState == "Cleared" || gameState == "TimeUp")
+        if (gameState == "TimeUp")
         {
             resultPanel.gameObject.SetActive(true);
             player.transform.position = goalPos;
@@ -65,7 +56,7 @@ public class GameSystem : MonoBehaviour
             int SECount2 = 0;
             resultTimeTx.text = String.Format("{0:##.#}", resultTime);  //小数点第二位以下を非表示
             resultScoreTx.text = String.Format("{0:####}", resultScore);  //整数のみ表示
-            if (resultTime < TimeScript.playTime)
+            if (resultTime < TimeScript.pastTime)
             {
                 GainResultTime();
             }         
@@ -82,14 +73,13 @@ public class GameSystem : MonoBehaviour
         {
             gameState = "TimeUp";
             playable = false;
-            ShowResult();
             TimeScript.playTime = 0;
         }
     }
     void GainResultTime()
     {
-        resultTime += TimeScript.playTime / 1500;
-        if (resultTime >= TimeScript.playTime)
+        resultTime += TimeScript.pastTime / 1500;
+        if (resultTime >= TimeScript.pastTime)
         {
             SoundEffect.BunTrigger = true;
         }
@@ -113,38 +103,36 @@ public class GameSystem : MonoBehaviour
     private Coroutine sizeEffectCoroutine;
     void Effect()
     {
-        if(combo != lastCombo)
+        if (combo != lastCombo)
         {
-          if (sizeEffectCoroutine != null)
-          {
-            // 既に実行中のコルーチンがあれば停止させる
-            StopCoroutine(sizeEffectCoroutine);
-          }
-          StartCoroutine(SizeEffect(comboText)); 
-          lastCombo = combo;
+            if (sizeEffectCoroutine != null)
+            {
+                // 既に実行中のコルーチンがあれば停止させる
+                StopCoroutine(sizeEffectCoroutine);
+            }
+            StartCoroutine(SizeEffect(comboText, 150, 220));
+            lastCombo = combo;
         }
 
     }
- IEnumerator SizeEffect(Text text)
-{
-    float originalSize = text.fontSize;
-    float sizeGoal = originalSize * 1.5f;
-    float speed = 5.0f;
-    while (text.fontSize < sizeGoal)
+    IEnumerator SizeEffect(Text text, float originalSize, float maxSize)
     {
-        text.fontSize = (int)Mathf.Lerp(text.fontSize, sizeGoal + 10, speed * Time.deltaTime);
-        yield return null;
-    }
+        float speed = 5.0f;
+        while (text.fontSize < maxSize)
+        {
+            text.fontSize = (int)Mathf.Lerp(text.fontSize, maxSize + 10, speed * Time.deltaTime);
+            yield return null;
+        }
 
-    yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(0.2f);
 
-    while (text.fontSize > originalSize)
-    {
-        text.fontSize = (int)Mathf.Lerp(text.fontSize, originalSize - 10, speed * Time.deltaTime);
-        yield return null;
+        while (text.fontSize > originalSize)
+        {
+            text.fontSize = (int)Mathf.Lerp(text.fontSize, originalSize - 10, speed * Time.deltaTime);
+            yield return null;
+        }
+        sizeEffectCoroutine = null;
     }
-    sizeEffectCoroutine = null;
-}
 
 
 }

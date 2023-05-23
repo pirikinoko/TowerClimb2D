@@ -5,15 +5,17 @@ using UnityEngine;
 public class Monster : MonoBehaviour
 {
     float Speed = 0.5f, jumpForce = 5f;
+    public float rightLimit, leftLimit;
     Rigidbody2D rb2D;
-    Vector2 characterDirection, MonsterPos, localScale;
+    Vector2 characterDirection, MonsterPos, localScale, defaultPos;
 
     bool onSurface = false;
     // Start is called before the first frame update
     void Start()
     {
-        Vector2 characterDirection = new Vector2(0.01f, 0.01f);
+        defaultPos = this.transform.position;
         MonsterPos = this.transform.position;
+        Vector2 characterDirection = new Vector2(0.01f, 0.01f);
     }
 
     // Update is called once per dadaDadad
@@ -21,16 +23,14 @@ public class Monster : MonoBehaviour
     {
         MonsterPos.x += Speed * Time.deltaTime;
         this.transform.position = MonsterPos;
-
+        if (MonsterPos.x >= defaultPos.x + rightLimit || MonsterPos.x < defaultPos.x - leftLimit)
+        {
+            Turn();
+        }
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("Turn") || other.gameObject.CompareTag("Wall") || other.gameObject.CompareTag("LeftWall") || other.gameObject.CompareTag("RightWall"))
-        {
-            Speed *= -1;
-            Turn(); 
-        }
         if (other.gameObject.CompareTag("Wepon"))
         {
 
@@ -55,7 +55,8 @@ public class Monster : MonoBehaviour
         }
     }
     void Turn()
-    {
+    {      
+        Speed *= -1;
         Vector2  characterDirection = gameObject.transform.localScale;
         characterDirection.x *= -1;
         gameObject.transform.localScale = characterDirection; 

@@ -8,18 +8,17 @@ public class TimeScript : MonoBehaviour
 
     public Text timer;
     public Text countDown;
-    public static float elapsedTime;
-    public static float playTime = 15;
-    public static float startTime = 3f;
-    public float TimeSet;
-    float soundTime = 1f;
+    public static float elapsedTime , playTime, pastTime; //操作用, 表示用, 総経過時間
+    public float setTime;
+    float startTime = 3f,soundTime = 1f;
     bool startFlag;
 
     // Start is called before the first frame update
     void Start()
     {
-        playTime = TimeSet;
-        elapsedTime = TimeSet;
+        playTime = setTime;
+        elapsedTime = setTime;
+        pastTime = 0;
         soundTime = 1f;
         startTime = 3f;
         startFlag = true;
@@ -73,6 +72,7 @@ public class TimeScript : MonoBehaviour
         {
             if (GameSystem.playable)
             {
+                pastTime += Time.deltaTime;
                 elapsedTime -= Time.deltaTime;
                 playTime = elapsedTime * 10;
                 playTime = Mathf.Floor(playTime) / 10;
