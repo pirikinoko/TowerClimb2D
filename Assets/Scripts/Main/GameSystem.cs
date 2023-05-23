@@ -118,15 +118,15 @@ public class GameSystem : MonoBehaviour
     IEnumerator SizeEffect(Text text, float originalSize, float maxSize)
     {
         float speed = 5.0f;
-        while (text.fontSize < maxSize)
+        while (text.fontSize <= maxSize)
         {
             text.fontSize = (int)Mathf.Lerp(text.fontSize, maxSize + 10, speed * Time.deltaTime);
             yield return null;
         }
 
-        yield return new WaitForSeconds(0.2f);
+        //yield return new WaitForSeconds(0.1f);
 
-        while (text.fontSize > originalSize)
+        while (text.fontSize >= originalSize)
         {
             text.fontSize = (int)Mathf.Lerp(text.fontSize, originalSize - 10, speed * Time.deltaTime);
             yield return null;

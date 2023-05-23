@@ -47,7 +47,7 @@ public class Player : MonoBehaviour
         legCol2d.transform.position = legPos;
         if (GameSystem.playable)
         {
-            getTiles();
+            //getTiles();
             Move();
             Jump();
             Slide();
