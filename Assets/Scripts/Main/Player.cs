@@ -17,11 +17,10 @@ public class Player : MonoBehaviour
     public Tilemap tilemap;
     public Text DebugText;
     public Vector2 defaultPos;
-    public float  speed = 1.2f, jumpForce = 1.7f;
-    public string judgeWall = "None";
-    float Gravity = 6000, elapsedTime, wallJumpTime, attackSign, attackDuration = 1.0f, slideDuration, maxJumpHeight = 0.34f;
+    public float  speed, jumpForce;
+    float Gravity = 4000, elapsedTime, wallJumpTime, attackSign, attackDuration = 1.0f, slideDuration, maxJumpHeight = 0.34f;
     [HideInInspector] public string animeState = "idle", wallName;
-    [HideInInspector] public bool onGround, legOnGround,  wallflag = false, jumpFlag = false, onWall, isMoving = false, isAttacking = false, slideFrag = false, spaceKeyState = false;
+    [HideInInspector] public bool onGround, legOnGround,  wallflag = false, jumpFlag = false, onWall, isMoving = false, isAttacking = false, isCrouch = false, isSlide = false, speceKeyPressed = false;
     [HideInInspector] public int jumpCount = 0;
     Vector3 latestPos , playerPos;
     Vector2 playerspeed;
@@ -43,19 +42,24 @@ public class Player : MonoBehaviour
     {
         //重力付与
         rbody2D.AddForce(transform.up * -Gravity * Time.deltaTime);
-        Vector3 legPos = playerPos; legPos.y -= 0.13f;
+        Vector3 legPos = playerPos; legPos.y -= 0.12f;
         legCol2d.transform.position = legPos;
+        legCol2d.offset = new Vector2(0, 0);
+        if (isSlide) 
+        {
+            legCol2d.offset = new Vector2(0.04f, 1.2f);
+        }
         if (GameSystem.playable)
         {
             //getTiles();
             Move();
             Jump();
-            Slide();
+            Ctrl();
             PlayerSpeed();
             PlayAnim();
             Attack();
         }
-        DebugText.text = jumpCount.ToString();
+        DebugText.text = "onGround: " + onGround ;
     }
 
 
@@ -77,7 +81,6 @@ public class Player : MonoBehaviour
         if (other.gameObject.CompareTag("Wall"))
         {
             string colname = other.gameObject.name;
-            judgeWall = colname.Substring(0, colname.Length - 4);
             animeState = "OnWall";
             //最後にぶつかった壁の名前が当たった壁と違うとき壁ジャンプリセット
             if (other.gameObject.name != wallName) { jumpCount = 1; }
@@ -90,8 +93,7 @@ public class Player : MonoBehaviour
         {
             if (legOnGround)
             {
-                if (isMoving == false && !spaceKeyState) { animeState = "idle"; }
-                judgeWall = "None";
+                if (isMoving == false && !speceKeyPressed) { animeState = "idle"; }
                 wallName = "Surface";
                 jumpCount = 0;
                 wallflag = false;
@@ -108,7 +110,7 @@ public class Player : MonoBehaviour
         if (other.gameObject.CompareTag("Surface"))
         {
             jumpCount = 1;
-            onGround = false;
+            onGround = false;       
         }
         //壁から離れたとき
         if (other.gameObject.CompareTag("Wall"))
@@ -135,7 +137,7 @@ public class Player : MonoBehaviour
     {
         //プレイヤーの位置を取得
         Vector2 position = transform.position;
-        if (slideFrag)
+        if (isSlide)
         {
             speed = 1.3f;
             Vector2 direction = gameObject.transform.localScale;
@@ -155,17 +157,17 @@ public class Player : MonoBehaviour
         if (Input.GetKey(KeyCode.A))
         {
             position.x -= speed * Time.deltaTime;
-            if (spaceKeyState == false && elapsedTime < maxJumpHeight + 0.1f)
+            if (speceKeyPressed == false && elapsedTime < maxJumpHeight + 0.1f)
             {
-                if (judgeWall != "None") { rbody2D.velocity = new Vector2(0, -0.5f);   }               
+                if (onWall) { rbody2D.velocity = new Vector2(0, -0.5f);   }               
             }
 
-            if (jumpCount < 1 && judgeWall == "None" && !(slideFrag))//アニメーション
+            if (jumpCount < 1 && !onWall && !(isSlide))//アニメーション
             {
                 animeState = "run";
             }
             isMoving = true;
-            if (!isAttacking && !slideFrag)
+            if (!isAttacking && !isSlide)
             {
                 Vector2 direction = new Vector2(0.1f, 0.1f);
                 gameObject.transform.localScale = direction;
@@ -176,24 +178,24 @@ public class Player : MonoBehaviour
          else if (Input.GetKey(KeyCode.D))
         {
             position.x += speed * Time.deltaTime;
-            if (spaceKeyState == false && elapsedTime < maxJumpHeight + 0.1f)
+            if (speceKeyPressed == false && elapsedTime < maxJumpHeight + 0.1f)
             {
-                if (judgeWall != "None") { rbody2D.velocity = new Vector2(0, -0.5f); }
+                if (onWall) { rbody2D.velocity = new Vector2(0, -0.5f); }
             }
 
-            if (jumpCount < 1 && judgeWall == "None" && !(slideFrag))//アニメーション
+            if (jumpCount < 1 && !onWall && !(isSlide))//アニメーション
             {
                 animeState = "run";
             }
             isMoving = true;
-            if (!isAttacking && !slideFrag)
+            if (!isAttacking && !isSlide)
             {
                 Vector2 direction = new Vector2(-0.1f, 0.1f);
                 gameObject.transform.localScale = direction;
             }
         }
 
-        if(Input.GetKeyUp(KeyCode.D) || Input.GetKeyUp(KeyCode.A))
+        if(isMoving && (Input.GetKeyUp(KeyCode.D) || Input.GetKeyUp(KeyCode.A)))
         {
             isMoving = false;
             animeState = "idle";
@@ -204,18 +206,20 @@ public class Player : MonoBehaviour
 
     void Jump()
     {   //地面にいるとき||壁に触れているとき
-        if ((Input.GetKeyDown(KeyCode.Space) && jumpCount == 0 && judgeWall == "None") || (Input.GetKeyDown(KeyCode.Space) && jumpCount == 1 && judgeWall != "None"))
+        if (!isSlide && (Input.GetKeyDown(KeyCode.Space) && jumpCount == 0 && !onWall) || (!isSlide && Input.GetKeyDown(KeyCode.Space) && jumpCount == 1 && (wallflag || onWall)))
         {
             rbody2D.velocity = new Vector2(0f, jumpForce);
             jumpCount++;
-            spaceKeyState = true; 
-            //アニメーション
-            animeState = "jump";
+            speceKeyPressed = true;
+            animeState = "jumpUp";
         }
-
+         if(!onGround && playerspeed.y < 0 && !onWall)
+        {
+            animeState = "jumpDown";
+        }
         if (Input.GetKeyUp(KeyCode.Space))
         {
-            spaceKeyState = false;
+            speceKeyPressed = false;
             if (playerspeed.y > 0)
             {
                 rbody2D.velocity = new Vector2(0, 0.5f);
@@ -229,7 +233,6 @@ public class Player : MonoBehaviour
         }
         if (wallJumpTime > 0.05f)
         {
-            judgeWall = "None";
             wallJumpTime = 0;
             wallflag = false;
         }
@@ -239,7 +242,7 @@ public class Player : MonoBehaviour
     void Attack()　//攻撃処理
     {
         Vector2 colPos = this.transform.position;
-        if (Input.GetMouseButtonDown(0) && !(isAttacking))
+        if (Input.GetMouseButtonDown(0) && !(isAttacking) &&  !isSlide)
         {
             isAttacking = true;
             playerAnim.SetTrigger("attack");
@@ -270,24 +273,44 @@ public class Player : MonoBehaviour
 
     }
 
-    void Slide()
+    void Ctrl()
     {
-        if (isAttacking || !onGround) { return; }
-        if (onGround && Input.GetKeyDown(KeyCode.LeftControl))
-        {      
-            slideFrag = true;
-        }
-        if (slideFrag)
+        if (!isAttacking && onGround && Input.GetKeyDown(KeyCode.LeftControl)) 
         {
-            animeState = "sliding";
-            slideDuration += Time.deltaTime;
             col2d.size = new Vector2(1, 1.8f);
-            if (slideDuration > 0.5f)
+            if (playerspeed.x < 0 || 0 < playerspeed.x)
+            {
+                isSlide = true;
+                slideDuration = 0f;
+            }
+            else
+            {
+                isCrouch = true;
+                animeState = "crouch";
+            }
+        }
+        if (isCrouch && Input.GetKeyUp(KeyCode.LeftControl))
+        {
+            col2d.size = new Vector2(1, 2.7f);
+            isCrouch = false;
+            animeState = "idle";
+        }
+
+        if (isCrouch)
+        {
+            col2d.size = new Vector2(1, 1.8f);
+        }
+ 
+
+        if(isSlide)
+        {
+            slideDuration += Time.deltaTime;
+            animeState = "sliding";
+            if (slideDuration > 0.5f || (!onGround && slideDuration > 0.15f))
             {
                 slideDuration = 0;
                 col2d.size = new Vector2(1, 2.7f);
-                col2d.offset = new Vector2(0.04f, 0.1f);
-                slideFrag = false;
+                isSlide = false;
                 animeState = "idle";
             }
         }
@@ -311,7 +334,8 @@ public class Player : MonoBehaviour
     {
         playerAnim.SetBool("idle", false);
         playerAnim.SetBool("run", false);
-        playerAnim.SetBool("jump", false);
+        playerAnim.SetBool("jumpUp", false);
+        playerAnim.SetBool("jumpDown", false);
         playerAnim.SetBool("OnWall", false);
         playerAnim.SetBool("sliding", false);
         playerAnim.SetBool(animeState, true);

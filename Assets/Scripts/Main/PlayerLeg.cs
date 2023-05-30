@@ -26,4 +26,5 @@ public class PlayerLeg : MonoBehaviour
             player.legOnGround = false;
         }
     }
+
 }
