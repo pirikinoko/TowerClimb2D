@@ -1,111 +1,188 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.Tilemaps;
 public class GenerateStage : MonoBehaviour
 {
-
-    GameObject[] obj = new GameObject[20];
-    public GameObject player; 
-    bool[] objActive = new bool[20];
-    Vector3[] objPos = new Vector3[20];
-    public float xMax, xMin, yMax, yMin;
-    int objType = 0, currentObj = 0, count = 0, target = 0;
+    [SerializeField] Tilemap castleBack, castleTile, skyTile;
+    [SerializeField] Tile backBrick, sideWall;
+    [SerializeField] GameObject player;
+    const int Floor = 0, Wall = 1, Right = 0, Left = 1, objUnit = 30;
+    const float rightLimit = 1.9f, leftLimit = -2.1f;
+    GameObject[] obj = new GameObject[objUnit];
+    bool[] objActive = new bool[objUnit];
+    Vector3[] objPos = new Vector3[objUnit];
+    int[] objectType = new int[objUnit];
+    float xMax = 0, xMin = 0,  yMax = 0, yMin = 0, playerYPrev;
+    int currentObj = 0, count = 0, target = 0, tileY, objLength, objDirection = 0;
     string [] objNames = { "Floor1" , "Wall1"};
-    const float rightLimit =  1.8f, leftLimit = -1.8f;
     // Start is called before the first frame update
     void Start()
     {
+        playerYPrev = player.transform.position.y;
+        tileY = 0;
         currentObj = 0;
-        objType = 0;
+        objectType[0] = 0;
         count = 0;
         target = 0; 
         for (int i = 0; i < 20; i++)
         {
             objActive[i] = false;
         }
-        objPos[19] = new Vector3(0, -4.5f, 0);
     }
 
     // Update is called once per frame
     void Update()
-    {   
-        
+    {
         DeleteObject();
-        if(objActive[currentObj] == false)
+        SetTiles();
+        if (objActive[currentObj] == false)
         {
+            // 次に生成するオブジェクトの種類を決定
+            objectType[currentObj] = Random.Range(0, objNames.Length);
+            int maxLength = 5;
+            if (objectType[currentObj] == Wall)
+            {
+                maxLength = 3;
+            }
+            objLength = Random.Range(1, maxLength + 1);
             SetObjectPos(currentObj);
-            GenerateObjects(currentObj);
-            objActive[currentObj] = true;
-            currentObj++;       
-            count++;
+            for (int i = 1; i < objLength; i++)
+            {
+                if(count > currentObj + objLength) 
+                {
+                    Destroy(obj[currentObj + i]);
+                    objActive[target] = false;
+                }       
+            }
+            for (int j = 0; j < objLength; j++)
+            {
+                int nextObj = currentObj + 1;            
+                if (nextObj == objUnit) { nextObj = 0; }
+                objectType[nextObj] = objectType[currentObj];
+                GenerateObjects(currentObj);
+                if(objLength != 1)
+                {
+                    obj[currentObj].name = "(" + (currentObj - j) + ")" + objNames[objectType[currentObj]] + "-" + currentObj.ToString();
+                }            
+                objActive[currentObj] = true;
+                objPos[nextObj] = objPos[currentObj];
+                switch (objectType[currentObj])
+                {
+                    case Floor:
+                        objPos[nextObj].x += 0.2f;
+                         if(objPos[nextObj].x >= rightLimit)
+                         {
+                            objDirection = Left;
+                         }
+                        if (objDirection == Left)
+                        {
+                            objPos[nextObj].x -= 0.4f;
+                            if(objPos[nextObj].x <= leftLimit) 
+                            {
+                                objPos[nextObj].x += 0.6f;
+                                objDirection = Right;
+                            }
+                        }
+                        break;
+                    case Wall:
+                        objPos[nextObj].y += 0.1f;
+                        break;
+                }
+                currentObj++;
+                if (currentObj == objUnit) { currentObj = 0; }
+                count++;
 
-            if(currentObj == 20) { currentObj = 0; }
+
+            }        
         }
     }
     void GenerateObjects(int targetNum)
     {
         
-        GameObject prefabObj = (GameObject)Resources.Load(objNames[objType]);
+        GameObject prefabObj = (GameObject)Resources.Load(objNames[objectType[targetNum]]);
         obj[targetNum] = Instantiate(prefabObj, objPos[targetNum], Quaternion.identity);
-        obj[targetNum].name = objNames[objType] + "-" +targetNum.ToString();
+        if(objLength == 1) { obj[targetNum].name = objNames[objectType[targetNum]] + "-" + targetNum.ToString(); } 
     }
     void SetObjectPos(int targetNum)
     {
+        if(count == 0) 
+        {
+            objPos[targetNum] = new Vector3(-1.5f, -3.8f, 0);
+            return;
+        }
         int prev = targetNum - 1;
-        float rateX = 1f, rateY = 1f;
-
-        // 次に生成するオブジェクトの種類を決定
-        objType = Random.Range(0, objNames.Length);
-        if (count == 0) { objType = 0; }
-
-        if (objType == 1)
-        {
-            rateX = 0.8f;
-            rateY = 1.1f;
+        if (prev == -1) { 
+            prev = objUnit - 1;
         }
-        if (count > 2 && objType == 0 && obj[prev].name.Contains("Wall"))
+
+        if (count == 0) { objectType[targetNum] = 0; }
+
+        switch(objectType[targetNum])
         {
-            rateY = 0.5f;
+            case Floor:　//床        
+            xMin = 0.5f; xMax = 0.8f;
+            yMin = 0.4f; yMax = 0.6f;
+            //壁→床の時
+            if (count >= 1 && objectType[prev] == Wall)
+            {
+                xMin = 0.6f; xMax = 0.9f;
+                yMin = 0.2f; yMax = 0.3f;
+            }
+            break;
+
+            case Wall:  //壁      
+            xMin = 0.6f; xMax = 0.8f;
+            yMin = 0.4f; yMax = 0.6f;
+            //床→壁の時
+            if (count >= 1 && objectType[prev] == Floor)
+            {
+                xMin = 0.7f; xMax = 0.9f;
+                yMin = 0.7f; yMax = 0.9f;
+            }
+            break;
         }
+
         if (targetNum == 0)
         {
-            prev = 19;
+            prev = objUnit - 1;
         }
         //次に生成するオブジェクトの方向を決定
-        int objDirection = Random.Range(0, 2); // 0か1が出る
+        objDirection = Random.Range(0, 2); // 0か1が出る
         int prev2 = prev -1;
-        if(prev == 0){
-            prev2 = 19;
-        }
-        if (count > 1 && ((objPos[prev].x - objPos[prev2].x) > 0))
+        if(prev2 == -1)
         {
-            objDirection = 0;
+            prev2 = objUnit - 1;
         }
-        else if (count > 1 && ((objPos[prev].x - objPos[prev2].x) < 0))
+     
+        if(count > 1 && leftLimit < objPos[prev].x && objPos[prev].x < leftLimit + 0.2) //ステージ範囲に収める
         {
-            objDirection = 1;
+            objDirection = Right;
         }
-        if(count > 1 && obj[prev].name.Contains("Floor") && leftLimit < objPos[prev].x && objPos[prev].x < leftLimit + 0.2)
+        else if ( count > 1 && rightLimit - 0.2f < objPos[prev].x && objPos[prev].x < rightLimit)
         {
-            objDirection = 1;
+            objDirection = Left;
         }
-        else if ( count > 1 && obj[prev].name.Contains("Floor") && rightLimit - 0.2f < objPos[prev].x && objPos[prev].x < rightLimit)
+        if (objectType[prev] == Wall && count > 1)
         {
-            objDirection = 0;
+            if (((objPos[prev].x - objPos[prev2].x) > 0))
+            {
+                objDirection = Left;
+            }
+            else { objDirection = Right; }
         }
-
+        Debug.Log("count" + count + "objDirection" + objDirection);
 
         // 新しいオブジェクトの位置を計算
         Vector3 newObjPos = new Vector3();
-        newObjPos.y = Random.Range(objPos[prev].y + yMin * rateY, objPos[prev].y + yMax * rateY);
-        if (objDirection == 1)
+        newObjPos.y = Random.Range(objPos[prev].y + yMin, objPos[prev].y + yMax);
+        if (objDirection == Right)
         {
-            newObjPos.x = Random.Range(objPos[prev].x + xMin * rateX, objPos[prev].x + xMax * rateX);
+            newObjPos.x = Random.Range(objPos[prev].x + xMin, objPos[prev].x + xMax);
         }
         else 
         {
-            newObjPos.x = Random.Range(objPos[prev].x - xMin * rateX, objPos[prev].x - xMax * rateX);
+            newObjPos.x = Random.Range(objPos[prev].x - xMin, objPos[prev].x - xMax);
         }
 
         newObjPos.x = Mathf.Clamp(newObjPos.x, leftLimit, rightLimit);
@@ -113,20 +190,38 @@ public class GenerateStage : MonoBehaviour
     }
 
 
- void DeleteObject()
-{
-    Vector3 playerPos = player.transform.position;
-    if (playerPos.y - objPos[target].y > 3 && obj[target] != null)
+    void DeleteObject()
     {
-        Destroy(obj[target]);
-        objActive[target] = false;
-        target++;
-        if (target >= 20)
+        Vector3 playerPos = player.transform.position;
+        if (playerPos.y - objPos[target].y > 2 && obj[target] != null)
         {
-            target = 0;
+            Destroy(obj[target]);
+            objActive[target] = false;
+            target++;
+            if (target >= objUnit)
+            {
+                target = 0;
+            }
         }
     }
-}
+    int drowPosY = -2;
+   
+    void SetTiles()
+    {
+        Vector3 playerPos = player.transform.position;
+        if(playerPos.y - playerYPrev > 0.2f) 
+        {
+            playerYPrev = playerPos.y;
+            drowPosY++;
+        }
+            for (int x = -7; x < 6; x++)
+            {
+                castleBack.SetTile(new Vector3Int(x, drowPosY, 0), backBrick);
+            }
+        castleTile.SetTile(new Vector3Int(-8, drowPosY, 0), sideWall);
+        castleTile.SetTile(new Vector3Int( 6, drowPosY, 0), sideWall);
 
+
+    }
 
 }

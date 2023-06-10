@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.Experimental.Rendering.Universal;
 public class Collision : MonoBehaviour
 {
     int count = 0;
@@ -28,16 +28,16 @@ public class Collision : MonoBehaviour
 
                 if (this.gameObject.CompareTag("Surface"))
                 {
-                    GetComponent<Renderer>().material.color = Color.red;
+                    this.gameObject.GetComponent<Light2D>().intensity = 0;
                     SoundEffect.KirarinTrigger = true;
                     GameSystem.combo++;
                     GameSystem.score += 5 * GameSystem.combo / 5;
                     TimeScript.elapsedTime += 1;
                     count++;
                 }
-                if (this.gameObject.CompareTag("AltWall"))
+                if (this.gameObject.CompareTag("Wall"))
                 {
-                    GetComponent<Renderer>().material.color = Color.blue;
+                    this.gameObject.GetComponent<Light2D>().intensity = 0;
                     SoundEffect.KirarinTrigger = true;
                     GameSystem.combo++;
                     GameSystem.score += 15 * GameSystem.combo / 5;
