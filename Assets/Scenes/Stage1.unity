@@ -269,7 +269,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -635, y: -463}
+  m_AnchoredPosition: {x: -238, y: -463}
   m_SizeDelta: {x: 1406.5, y: 455.9}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &274654083
@@ -299,7 +299,7 @@ MonoBehaviour:
     m_BestFit: 0
     m_MinSize: 0
     m_MaxSize: 300
-    m_Alignment: 4
+    m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
@@ -13655,7 +13655,7 @@ MonoBehaviour:
   DebugText: {fileID: 1004466033}
   defaultPos: {x: 0, y: -3.8}
   speed: 1
-  jumpForce: 2.1
+  jumpForce: 2
   animeState: idle
   wallName: 
   onGround: 0
