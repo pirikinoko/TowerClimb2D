@@ -232,7 +232,7 @@ public class Player : MonoBehaviour
         {
             wallJumpTime += Time.deltaTime;
         }
-        if (wallJumpTime > 0.05f)
+        if (wallJumpTime > 0.1f)
         {
             wallJumpTime = 0;
             wallflag = false;

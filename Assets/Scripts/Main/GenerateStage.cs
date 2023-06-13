@@ -15,7 +15,7 @@ public class GenerateStage : MonoBehaviour
     public float deadLine { get; set; }
     int[] objectType = new int[objUnit];
     float xMax = 0, xMin = 0,  yMax = 0, yMin = 0, playerYPrev;
-    int currentObj = 0, count = 0, target = 0, tileY, objLength, objDirection = 0;
+    int currentObj = 0, prev, prev2,  count = 0, target = 0, tileY, objLength, objDirection = 0;
     string [,] objNames = { { "Floor1", "Floor2", "Floor3" }, { "Wall1", "Wall2", "Wall3" } };
     // Start is called before the first frame update
     void Start()
@@ -38,6 +38,7 @@ public class GenerateStage : MonoBehaviour
     {
         DeleteObject();
         SetTiles();
+        SetNumbers();
         if (objActive[currentObj] == false)
         {
             // 次に生成するオブジェクトの種類を決定
@@ -64,21 +65,34 @@ public class GenerateStage : MonoBehaviour
     }
     void SetObjectPos(int targetNum)
     {
+        //一番最初のオブジェクトの位置
         if(count == 0) 
         {
             objPos[targetNum] = new Vector3(-1.5f, -3.8f, 0);
             return;
         }
-        int prev = targetNum - 1;
-        if (prev == -1) { 
-            prev = objUnit - 1;
+       
+        //次に生成するオブジェクトの方向を決定
+        // 0か1が出る 
+        objDirection = Random.Range(0, 2); 
+        //ステージ範囲に収める
+         if(count > 1 && objPos[prev].x < leftLimit + 0.5f) 
+        {
+            objectType[targetNum] = 0;
+            objDirection = Right;
+        }
+        else if ( count > 1 && rightLimit - 0.5f < objPos[prev].x)
+        {
+            objectType[targetNum] = 0;
+            objDirection = Left;
         }
 
         if (count == 0) { objectType[targetNum] = 0; }
 
+        //次のオブジェクトの距離の幅をオブジェクトの種類によって決定
         switch(objectType[targetNum])
         {
-            case Floor:　//床        
+            case Floor: //床        
             xMin = 0.5f; xMax = 0.8f;
             yMin = 0.4f; yMax = 0.6f;
             //壁→床の時
@@ -101,26 +115,7 @@ public class GenerateStage : MonoBehaviour
             break;
         }
 
-        if (targetNum == 0)
-        {
-            prev = objUnit - 1;
-        }
-        //次に生成するオブジェクトの方向を決定
-        objDirection = Random.Range(0, 2); // 0か1が出る
-        int prev2 = prev -1;
-        if(prev2 == -1)
-        {
-            prev2 = objUnit - 1;
-        }
-     
-        if(count > 1 && leftLimit < objPos[prev].x && objPos[prev].x < leftLimit + 0.2) //ステージ範囲に収める
-        {
-            objDirection = Right;
-        }
-        else if ( count > 1 && rightLimit - 0.2f < objPos[prev].x && objPos[prev].x < rightLimit)
-        {
-            objDirection = Left;
-        }
+        //前のオブジェクトが壁の時壁ジャンプの方向にオブジェクトを生成
         if (objectType[prev] == Wall && count > 1)
         {
             if (((objPos[prev].x - objPos[prev2].x) > 0))
@@ -180,8 +175,19 @@ public class GenerateStage : MonoBehaviour
             }
         castleTile.SetTile(new Vector3Int(-8, drowPosY, 0), sideWall);
         castleTile.SetTile(new Vector3Int( 6, drowPosY, 0), sideWall);
-
-
     }
 
+    void SetNumbers()
+    {
+        prev = currentObj - 1;
+        if (prev == -1)
+        { 
+            prev = objUnit - 1;
+        }
+        prev2 = prev -1;
+        if(prev2 == -1)
+        {
+            prev2 = objUnit - 1;
+        }
+    }
 }

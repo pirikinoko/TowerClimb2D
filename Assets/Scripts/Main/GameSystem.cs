@@ -9,7 +9,7 @@ public class GameSystem : MonoBehaviour
     public Text scoreText, comboText, resultScoreTx, resultTimeTx, rankTx;
     public GameObject scoreTextGO, comboTextGO, player, resultPanel,goalLine;
     public static int combo;
-    int scoreDisplay;
+    float scoreDisplay;
     public static float resultTime, resultScore , score;
     int stage1Goal = 5, lastCombo = 0;
     string rank;
@@ -40,7 +40,7 @@ public class GameSystem : MonoBehaviour
         ScoreDisplay();
         GameOver();
         Effect();
-        scoreText.text = scoreDisplay.ToString();
+        scoreText.text = String.Format("{0:####}", scoreDisplay);
         comboText.text = combo.ToString();
     }
     void FixedUpdate()
@@ -66,7 +66,7 @@ public class GameSystem : MonoBehaviour
                 {
                     SoundEffect.BunTrigger = true;
                 }
-                yield return null;
+                yield return new WaitForSeconds(0.01f);
             }
             while (resultScore < score)
             {
@@ -75,7 +75,7 @@ public class GameSystem : MonoBehaviour
                 {
                     SoundEffect.BunTrigger = true;
                 }
-                yield return null;
+               yield return new WaitForSeconds(0.01f);
             }     
 
             if(score > 10000) 
@@ -107,8 +107,9 @@ public class GameSystem : MonoBehaviour
     {
         if(scoreDisplay < score)
         {
-            scoreDisplay ++;
+            scoreDisplay += score / 300;
         }
+        else{ scoreDisplay = score; }
     }
     private Coroutine sizeEffectCoroutine;
     void Effect()
@@ -129,10 +130,10 @@ public class GameSystem : MonoBehaviour
     {
         float speed = 5.0f;
         text.fontSize = originalSize;
-        int n = 1;
+        int n = 350;
         while (text.fontSize <= maxSize)
         {
-            text.fontSize += n;
+            text.fontSize += (int)(n * Time.deltaTime);
             if (text.fontSize % 2 == 0) { yield return null; }
         }
 
@@ -140,7 +141,7 @@ public class GameSystem : MonoBehaviour
 
         while (text.fontSize >= originalSize)
         {
-            text.fontSize -= n;
+            text.fontSize -= (int)(n * Time.deltaTime);
             if (text.fontSize % 2 == 0) { yield return null; }
         }
         sizeEffectCoroutine = null;
