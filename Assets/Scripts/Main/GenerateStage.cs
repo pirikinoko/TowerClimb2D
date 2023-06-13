@@ -10,13 +10,14 @@ public class GenerateStage : MonoBehaviour
     const int Floor = 0, Wall = 1, Right = 0, Left = 1, objUnit = 30;
     const float rightLimit = 1.9f, leftLimit = -2.1f;
     GameObject[] obj = new GameObject[objUnit];
+    GameObject[] enemy = new GameObject[5];
     bool[] objActive = new bool[objUnit];
     Vector3[] objPos = new Vector3[objUnit];
     public float deadLine { get; set; }
     int[] objectType = new int[objUnit];
     float xMax = 0, xMin = 0,  yMax = 0, yMin = 0, playerYPrev;
     int currentObj = 0, prev, prev2,  count = 0, target = 0, tileY, objLength, objDirection = 0;
-    string [,] objNames = { { "Floor1", "Floor2", "Floor3" }, { "Wall1", "Wall2", "Wall3" } };
+    string [,] objNames = { { "Floor1", "Floor2", "Floor3", "Floor4" }, { "Wall1", "Wall2", "Wall3" , "Wall2"} };
     // Start is called before the first frame update
     void Start()
     {
@@ -44,7 +45,7 @@ public class GenerateStage : MonoBehaviour
             // 次に生成するオブジェクトの種類を決定
             objectType[currentObj] = Random.Range(0, 2);
             int maxLength = 3;
-            if (objectType[currentObj] == Wall)
+            if (objectType[currentObj] == Floor)
             {
                 maxLength = 3;
             }
@@ -62,13 +63,24 @@ public class GenerateStage : MonoBehaviour
         GameObject prefabObj = (GameObject)Resources.Load(objNames[objectType[targetNum], objLength - 1]);
         obj[targetNum] = Instantiate(prefabObj, objPos[targetNum], Quaternion.identity);
         obj[targetNum].name = objNames[objectType[targetNum] , objLength - 1] + "-" + targetNum.ToString(); 
+
+        
+        if(objLength == 4)
+        {
+            Vector3 enemyPos = objPos[targetNum];
+            enemyPos.y += 0.02f;
+            GameObject enemyObj = (GameObject)Resources.Load("slime");
+            enemy[targetNum] = Instantiate(enemyObj, enemyPos, Quaternion.identity);
+        }
+        
     }
     void SetObjectPos(int targetNum)
     {
         //一番最初のオブジェクトの位置
         if(count == 0) 
         {
-            objPos[targetNum] = new Vector3(-1.5f, -3.8f, 0);
+            objPos[targetNum] = new Vector3(1.0f, -3.8f, 0);
+            objectType[0] = 0;
             return;
         }
        

@@ -48,7 +48,7 @@ public class Player : MonoBehaviour
         legCol2d.offset = new Vector2(0, 0);
         if (isSlide) 
         {
-            legCol2d.offset = new Vector2(0.04f, 1.2f);
+            legCol2d.offset = new Vector2(0.04f, 1.6f);
         }
         if (GameSystem.playable)
         {
@@ -118,7 +118,7 @@ public class Player : MonoBehaviour
         {
             wallflag = true;
             onWall = false;
-            animeState = "jump";
+            animeState = "jumpUp";
         }
     }
 
@@ -240,10 +240,10 @@ public class Player : MonoBehaviour
 
     }
 
-    void Attack()　//攻撃処理
+    void Attack() //攻撃処理
     {
         Vector2 colPos = this.transform.position;
-        if (Input.GetMouseButtonDown(0) && !(isAttacking) &&  !isSlide)
+        if (Input.GetKeyDown(KeyCode.N) && !(isAttacking) &&  !isSlide)
         {
             isAttacking = true;
             playerAnim.SetTrigger("attack");

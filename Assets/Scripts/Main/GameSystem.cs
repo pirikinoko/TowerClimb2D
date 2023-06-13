@@ -50,7 +50,7 @@ public class GameSystem : MonoBehaviour
 
     IEnumerator ShowResult()
     {
-        if (gameState == "Over")
+        if (gameState == "Result")
         {
             resultPanel.gameObject.SetActive(true);
             rankTx.text = null;
@@ -66,7 +66,7 @@ public class GameSystem : MonoBehaviour
                 {
                     SoundEffect.BunTrigger = true;
                 }
-                yield return new WaitForSeconds(0.01f);
+                yield return new WaitForSeconds(0.3f);
             }
             while (resultScore < score)
             {
@@ -75,31 +75,29 @@ public class GameSystem : MonoBehaviour
                 {
                     SoundEffect.BunTrigger = true;
                 }
-               yield return new WaitForSeconds(0.01f);
+               yield return new WaitForSeconds(0.3f);
             }     
-
+             yield return new WaitForSeconds(1f);
             if(score > 10000) 
             {
                 rankTx.text = "A";
             }
             else { rankTx.text = "B"; }
+            gameState = "Over";
         }
       
     }
     void GameOver()
     {
         Vector2 playerPos = player.transform.position;
-        if(TimeScript.playTime < 0)
+        if(gameState == "Playing")
         {
-            gameState = "Over";
-            playable = false;
-            TimeScript.playTime = 0;
-        }
-        if(playerPos.y < generateStage.deadLine) 
-        {
-            gameState = "Over";
-            playable = false;
-            TimeScript.playTime = 0;
+            if(TimeScript.playTime < 0 || playerPos.y < generateStage.deadLine)
+            {
+                gameState = "Result";
+                playable = false;
+                TimeScript.playTime = 0;
+            }
         }
     }
 
