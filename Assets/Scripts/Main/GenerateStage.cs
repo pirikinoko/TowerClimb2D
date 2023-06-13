@@ -12,10 +12,11 @@ public class GenerateStage : MonoBehaviour
     GameObject[] obj = new GameObject[objUnit];
     bool[] objActive = new bool[objUnit];
     Vector3[] objPos = new Vector3[objUnit];
+    public float deadLine { get; set; }
     int[] objectType = new int[objUnit];
     float xMax = 0, xMin = 0,  yMax = 0, yMin = 0, playerYPrev;
     int currentObj = 0, count = 0, target = 0, tileY, objLength, objDirection = 0;
-    string [] objNames = { "Floor1" , "Wall1"};
+    string [,] objNames = { { "Floor1", "Floor2", "Floor3" }, { "Wall1", "Wall2", "Wall3" } };
     // Start is called before the first frame update
     void Start()
     {
@@ -25,6 +26,7 @@ public class GenerateStage : MonoBehaviour
         objectType[0] = 0;
         count = 0;
         target = 0; 
+        deadLine = -10;
         for (int i = 0; i < 20; i++)
         {
             objActive[i] = false;
@@ -39,70 +41,26 @@ public class GenerateStage : MonoBehaviour
         if (objActive[currentObj] == false)
         {
             // 次に生成するオブジェクトの種類を決定
-            objectType[currentObj] = Random.Range(0, objNames.Length);
-            int maxLength = 5;
+            objectType[currentObj] = Random.Range(0, 2);
+            int maxLength = 3;
             if (objectType[currentObj] == Wall)
             {
                 maxLength = 3;
             }
             objLength = Random.Range(1, maxLength + 1);
             SetObjectPos(currentObj);
-            for (int i = 1; i < objLength; i++)
-            {
-                if(count > currentObj + objLength) 
-                {
-                    Destroy(obj[currentObj + i]);
-                    objActive[target] = false;
-                }       
-            }
-            for (int j = 0; j < objLength; j++)
-            {
-                int nextObj = currentObj + 1;            
-                if (nextObj == objUnit) { nextObj = 0; }
-                objectType[nextObj] = objectType[currentObj];
-                GenerateObjects(currentObj);
-                if(objLength != 1)
-                {
-                    obj[currentObj].name = "(" + (currentObj - j) + ")" + objNames[objectType[currentObj]] + "-" + currentObj.ToString();
-                }            
-                objActive[currentObj] = true;
-                objPos[nextObj] = objPos[currentObj];
-                switch (objectType[currentObj])
-                {
-                    case Floor:
-                        objPos[nextObj].x += 0.2f;
-                         if(objPos[nextObj].x >= rightLimit)
-                         {
-                            objDirection = Left;
-                         }
-                        if (objDirection == Left)
-                        {
-                            objPos[nextObj].x -= 0.4f;
-                            if(objPos[nextObj].x <= leftLimit) 
-                            {
-                                objPos[nextObj].x += 0.6f;
-                                objDirection = Right;
-                            }
-                        }
-                        break;
-                    case Wall:
-                        objPos[nextObj].y += 0.1f;
-                        break;
-                }
-                currentObj++;
-                if (currentObj == objUnit) { currentObj = 0; }
-                count++;
-
-
-            }        
+            GenerateObjects(currentObj);
+            objActive[currentObj] = true;
+            currentObj++;
+            if (currentObj == objUnit) { currentObj = 0; }
+            count++;
         }
     }
     void GenerateObjects(int targetNum)
     {
-        
-        GameObject prefabObj = (GameObject)Resources.Load(objNames[objectType[targetNum]]);
+        GameObject prefabObj = (GameObject)Resources.Load(objNames[objectType[targetNum], objLength - 1]);
         obj[targetNum] = Instantiate(prefabObj, objPos[targetNum], Quaternion.identity);
-        if(objLength == 1) { obj[targetNum].name = objNames[objectType[targetNum]] + "-" + targetNum.ToString(); } 
+        obj[targetNum].name = objNames[objectType[targetNum] , objLength - 1] + "-" + targetNum.ToString(); 
     }
     void SetObjectPos(int targetNum)
     {
@@ -193,8 +151,10 @@ public class GenerateStage : MonoBehaviour
     void DeleteObject()
     {
         Vector3 playerPos = player.transform.position;
-        if (playerPos.y - objPos[target].y > 2 && obj[target] != null)
+        if (playerPos.y - objPos[target].y > 4 && obj[target] != null)
         {
+            deadLine = objPos[target].y;
+            deadLine -= 3;
             Destroy(obj[target]);
             objActive[target] = false;
             target++;
@@ -209,7 +169,7 @@ public class GenerateStage : MonoBehaviour
     void SetTiles()
     {
         Vector3 playerPos = player.transform.position;
-        if(playerPos.y - playerYPrev > 0.2f) 
+        if (playerPos.y - playerYPrev > 0.2f) 
         {
             playerYPrev = playerPos.y;
             drowPosY++;

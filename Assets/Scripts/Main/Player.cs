@@ -17,7 +17,7 @@ public class Player : MonoBehaviour
     public Text DebugText;
     public Vector2 defaultPos;
     public float  speed, jumpForce;
-    float Gravity = 3700, elapsedTime, wallJumpTime, attackSign, attackDuration = 1.0f, slideDuration;
+    float Gravity = 3000, elapsedTime, wallJumpTime, attackSign, attackDuration = 1.0f, slideDuration;
     [HideInInspector] public string animeState = "idle", wallName;
     [HideInInspector] public bool onGround, legOnGround,  wallflag = false, jumpFlag = false, onWall, isMoving = false, isAttacking = false, isCrouch = false, isSlide = false, speceKeyPressed = false;
     [HideInInspector] public int jumpCount = 0;
@@ -167,7 +167,7 @@ public class Player : MonoBehaviour
             {
                 animeState = "run";
             }
-            isMoving = true;
+            if (onGround) { isMoving = true; }
             if (!isAttacking && !isSlide)
             {
                 Vector2 direction = new Vector2(0.1f, 0.1f);
@@ -188,7 +188,7 @@ public class Player : MonoBehaviour
             {
                 animeState = "run";
             }
-            isMoving = true;
+            if (onGround) { isMoving = true; }
             if (!isAttacking && !isSlide)
             {
                 Vector2 direction = new Vector2(-0.1f, 0.1f);
