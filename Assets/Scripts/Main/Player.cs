@@ -11,24 +11,25 @@ public class Player : MonoBehaviour
     [SerializeField] GameObject attackCol;
     [SerializeField]
     private Animator playerAnim;
-    CapsuleCollider2D col2d;
-    BoxCollider2D legCol2d;
+    BoxCollider2D legCol2d, col2d;
     public static Vector2 characterDirection;
     public Tilemap tilemap;
     public Text DebugText;
     public Vector2 defaultPos;
     public float  speed, jumpForce;
-    float Gravity = 4000, elapsedTime, wallJumpTime, attackSign, attackDuration = 1.0f, slideDuration, maxJumpHeight = 0.34f;
+    float Gravity = 3000, elapsedTime, wallJumpTime, attackSign, attackDuration = 1.0f, slideDuration;
     [HideInInspector] public string animeState = "idle", wallName;
     [HideInInspector] public bool onGround, legOnGround,  wallflag = false, jumpFlag = false, onWall, isMoving = false, isAttacking = false, isCrouch = false, isSlide = false, speceKeyPressed = false;
     [HideInInspector] public int jumpCount = 0;
     Vector3 latestPos , playerPos;
     Vector2 playerspeed;
+    Vector2 defaultSize;
  
     void Start()
     {
         player = this.gameObject;
-        col2d = this.GetComponent<CapsuleCollider2D>();
+        col2d = this.GetComponent<BoxCollider2D>();
+        defaultSize = col2d.size;
         legCol2d = transform.GetChild(0).gameObject.GetComponent<BoxCollider2D>();
         //Rigidbodyを取得
         rbody2D = GetComponent<Rigidbody2D>();
@@ -157,7 +158,7 @@ public class Player : MonoBehaviour
         if (Input.GetKey(KeyCode.A))
         {
             position.x -= speed * Time.deltaTime;
-            if (speceKeyPressed == false && elapsedTime < maxJumpHeight + 0.1f)
+            if (speceKeyPressed == false && playerspeed.y < 0)
             {
                 if (onWall) { rbody2D.velocity = new Vector2(0, -0.5f);   }               
             }
@@ -166,7 +167,7 @@ public class Player : MonoBehaviour
             {
                 animeState = "run";
             }
-            isMoving = true;
+            if (onGround) { isMoving = true; }
             if (!isAttacking && !isSlide)
             {
                 Vector2 direction = new Vector2(0.1f, 0.1f);
@@ -178,7 +179,7 @@ public class Player : MonoBehaviour
          else if (Input.GetKey(KeyCode.D))
         {
             position.x += speed * Time.deltaTime;
-            if (speceKeyPressed == false && elapsedTime < maxJumpHeight + 0.1f)
+            if (speceKeyPressed == false && playerspeed.y < 0)
             {
                 if (onWall) { rbody2D.velocity = new Vector2(0, -0.5f); }
             }
@@ -187,7 +188,7 @@ public class Player : MonoBehaviour
             {
                 animeState = "run";
             }
-            isMoving = true;
+            if (onGround) { isMoving = true; }
             if (!isAttacking && !isSlide)
             {
                 Vector2 direction = new Vector2(-0.1f, 0.1f);
@@ -291,7 +292,7 @@ public class Player : MonoBehaviour
         }
         if (isCrouch && Input.GetKeyUp(KeyCode.LeftControl))
         {
-            col2d.size = new Vector2(1, 2.7f);
+            col2d.size = defaultSize;
             isCrouch = false;
             animeState = "idle";
         }
@@ -309,7 +310,7 @@ public class Player : MonoBehaviour
             if (slideDuration > 0.5f || (!onGround && slideDuration > 0.15f))
             {
                 slideDuration = 0;
-                col2d.size = new Vector2(1, 2.7f);
+                col2d.size = defaultSize;
                 isSlide = false;
                 animeState = "idle";
             }

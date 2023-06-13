@@ -16,6 +16,7 @@ public class GameSystem : MonoBehaviour
     public static string gameState = "Playing";
     public static bool playable = true;
     Vector2 goalPos; //ゴールした時のプレイヤー位置
+    GenerateStage generateStage;
     // Start is called before the first frame update
     void Start()
     {
@@ -30,66 +31,75 @@ public class GameSystem : MonoBehaviour
         scoreTextGO = GameObject.Find("Score");
         comboTextGO = GameObject.Find("Combo");
         resultPanel.gameObject.SetActive(false);
+        generateStage = GameObject.Find("GameSystem").GetComponent<GenerateStage>();
     }
 
     // Update is called once per frame
     void Update()
     {
         ScoreDisplay();
-        TimeUp();
+        GameOver();
         Effect();
         scoreText.text = scoreDisplay.ToString();
         comboText.text = combo.ToString();
     }
     void FixedUpdate()
     {
-        ShowResult();
+        StartCoroutine(ShowResult());
     }
 
-    void ShowResult()
+    IEnumerator ShowResult()
     {
-        if (gameState == "TimeUp")
+        if (gameState == "Over")
         {
             resultPanel.gameObject.SetActive(true);
+            rankTx.text = null;
             player.transform.position = goalPos;
             int SECount1 = 0;
             int SECount2 = 0;
             resultTimeTx.text = String.Format("{0:##.#}", resultTime);  //小数点第二位以下を非表示
             resultScoreTx.text = String.Format("{0:####}", resultScore);  //整数のみ表示
-            if (resultTime < TimeScript.pastTime)
+            while(resultTime < TimeScript.pastTime)
             {
-                GainResultTime();
-            }         
-            else if (resultScore < score)
+                resultTime += TimeScript.pastTime / 1500;
+                if (resultTime >= TimeScript.pastTime)
+                {
+                    SoundEffect.BunTrigger = true;
+                }
+                yield return null;
+            }
+            while (resultScore < score)
             {
-                GainResultScore();
+                resultScore += score / 1500;
+                if (resultScore == score)
+                {
+                    SoundEffect.BunTrigger = true;
+                }
+                yield return null;
             }     
+
+            if(score > 10000) 
+            {
+                rankTx.text = "A";
+            }
+            else { rankTx.text = "B"; }
         }
       
     }
-    void TimeUp()
+    void GameOver()
     {
+        Vector2 playerPos = player.transform.position;
         if(TimeScript.playTime < 0)
         {
-            gameState = "TimeUp";
+            gameState = "Over";
             playable = false;
             TimeScript.playTime = 0;
         }
-    }
-    void GainResultTime()
-    {
-        resultTime += TimeScript.pastTime / 1500;
-        if (resultTime >= TimeScript.pastTime)
+        if(playerPos.y < generateStage.deadLine) 
         {
-            SoundEffect.BunTrigger = true;
-        }
-    }
-    void GainResultScore()
-    {
-        resultScore += score / 1500;
-        if (resultScore == score)
-        {
-            SoundEffect.BunTrigger = true;
+            gameState = "Over";
+            playable = false;
+            TimeScript.playTime = 0;
         }
     }
 
@@ -115,21 +125,23 @@ public class GameSystem : MonoBehaviour
         }
 
     }
-    IEnumerator SizeEffect(Text text, float originalSize, float maxSize)
+    IEnumerator SizeEffect(Text text, int originalSize, int maxSize)
     {
         float speed = 5.0f;
+        text.fontSize = originalSize;
+        int n = 1;
         while (text.fontSize <= maxSize)
         {
-            text.fontSize = (int)Mathf.Lerp(text.fontSize, maxSize + 10, speed * Time.deltaTime);
-            yield return null;
+            text.fontSize += n;
+            if (text.fontSize % 2 == 0) { yield return null; }
         }
 
         //yield return new WaitForSeconds(0.1f);
 
         while (text.fontSize >= originalSize)
         {
-            text.fontSize = (int)Mathf.Lerp(text.fontSize, originalSize - 10, speed * Time.deltaTime);
-            yield return null;
+            text.fontSize -= n;
+            if (text.fontSize % 2 == 0) { yield return null; }
         }
         sizeEffectCoroutine = null;
     }
