@@ -5,7 +5,6 @@ using UnityEngine.Experimental.Rendering.Universal;
 public class Collision : MonoBehaviour
 {
     int count = 0;
-   
     // Start is called before the first frame update
     void Start()
     {
@@ -16,8 +15,7 @@ public class Collision : MonoBehaviour
         if (other.gameObject.CompareTag("Player"))
         {
             if(count == 0)
-            {
-              
+            { 
                 if (this.gameObject.CompareTag("Enemy"))
                 {
                     GameSystem.score -= 5;
@@ -47,7 +45,24 @@ public class Collision : MonoBehaviour
             }
           
         }
-
     }
-
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if(this.gameObject.name.Contains("Check"))
+        {
+            int objNumber = 0;
+            if(other.gameObject.name.Contains("Wall"))
+            {
+                objNumber += 4;
+            }
+            for(int i = 0; i < 4; i++)
+            {
+                if(other.gameObject.name.Contains((i + 1).ToString()))
+                {
+                    objNumber += i;
+                }
+            }
+            GenerateStage.collisionPos[objNumber] = this.gameObject.transform.position.x;
+        }
+    }
 }

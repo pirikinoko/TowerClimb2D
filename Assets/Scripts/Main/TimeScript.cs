@@ -8,9 +8,9 @@ public class TimeScript : MonoBehaviour
 
     public Text timer;
     public Text countDown;
-    public static float elapsedTime , playTime, pastTime; //操作用, 表示用, 総経過時間
+    public static float elapsedTime , playTime, pastTime, startTime = 3f; //操作用, 表示用, 総経過時間, カウントダウン
     public float setTime;
-    float startTime = 3f,soundTime = 1f;
+    float soundTime = 1f;
     bool startFlag;
 
     // Start is called before the first frame update
