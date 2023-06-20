@@ -8,7 +8,7 @@ public class GenerateStage : MonoBehaviour
     [SerializeField] Tile backBrick, sideWall;
     [SerializeField] GameObject player;
     const int Floor = 0, Wall = 1, Right = 0, Left = 1, objUnit = 30;
-    const float rightLimit = 1.9f, leftLimit = -2.1f;
+    const float rightLimit = 1.8f, leftLimit = -2.1f;
     GameObject[] obj = new GameObject[objUnit];
     GameObject[] enemy = new GameObject[5];
     bool[] objActive = new bool[objUnit];
@@ -16,8 +16,9 @@ public class GenerateStage : MonoBehaviour
     public float deadLine { get; set; }
     int[] objectType = new int[objUnit];
     float xMax = 0, xMin = 0,  yMax = 0, yMin = 0, playerYPrev;
-    int currentObj = 0, prev, prev2,  count = 0, target = 0, tileY, objLength, objDirection = 0;
-    string [,] objNames = { { "Floor1", "Floor2", "Floor3", "Floor4" }, { "Wall1", "Wall2", "Wall3" , "Wall2"} };
+    int currentObj = 0, prev, prev2, count = 0, target = 0, tileY, objLength, objDirection = 0, enemyCount = 0;
+    string [,] objNames = { { "Floor1", "Floor2", "Floor3", "Floor4" }, { "Wall1", "Wall2", "Wall3" , "Wall4"} };
+    float  [,] addDistance ={ {  0,       0.05f,     0.1f,     0.2f  }, {    0,     0.05f,    0.1f,     0.2f } };
     // Start is called before the first frame update
     void Start()
     {
@@ -26,7 +27,8 @@ public class GenerateStage : MonoBehaviour
         currentObj = 0;
         objectType[0] = 0;
         count = 0;
-        target = 0; 
+        target = 0;
+        enemyCount = 0;
         deadLine = -10;
         for (int i = 0; i < 20; i++)
         {
@@ -47,7 +49,7 @@ public class GenerateStage : MonoBehaviour
             int maxLength = 3;
             if (objectType[currentObj] == Floor)
             {
-                maxLength = 3;
+                maxLength = 4;
             }
             objLength = Random.Range(1, maxLength + 1);
             SetObjectPos(currentObj);
@@ -68,9 +70,14 @@ public class GenerateStage : MonoBehaviour
         if(objLength == 4)
         {
             Vector3 enemyPos = objPos[targetNum];
-            enemyPos.y += 0.02f;
+            enemyPos.y += 0.015f;
             GameObject enemyObj = (GameObject)Resources.Load("slime");
-            enemy[targetNum] = Instantiate(enemyObj, enemyPos, Quaternion.identity);
+            enemy[enemyCount] = Instantiate(enemyObj, enemyPos, Quaternion.identity);
+            enemyCount++;
+            if(enemyCount == 5) 
+            {
+                enemyCount = 0;
+            }
         }
         
     }
@@ -101,7 +108,7 @@ public class GenerateStage : MonoBehaviour
 
         if (count == 0) { objectType[targetNum] = 0; }
 
-        //次のオブジェクトの距離の幅をオブジェクトの種類によって決定
+        //前のオブジェクトとの距離
         switch(objectType[targetNum])
         {
             case Floor: //床        
@@ -113,8 +120,9 @@ public class GenerateStage : MonoBehaviour
                 xMin = 0.6f; xMax = 0.9f;
                 yMin = 0.2f; yMax = 0.3f;
             }
-            break;
-
+                xMin += addDistance[objectType[targetNum], objLength - 1];
+                xMax += addDistance[objectType[targetNum], objLength - 1];
+                break;
             case Wall:  //壁      
             xMin = 0.6f; xMax = 0.8f;
             yMin = 0.4f; yMax = 0.6f;
@@ -124,7 +132,9 @@ public class GenerateStage : MonoBehaviour
                 xMin = 0.7f; xMax = 0.9f;
                 yMin = 0.7f; yMax = 0.9f;
             }
-            break;
+                yMin += addDistance[objectType[targetNum], objLength - 1];
+                yMax += addDistance[objectType[targetNum], objLength - 1];
+                break;                            
         }
 
         //前のオブジェクトが壁の時壁ジャンプの方向にオブジェクトを生成
