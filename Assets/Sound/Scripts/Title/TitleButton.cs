@@ -8,7 +8,7 @@ public class TitleButton : MonoBehaviour
    
     public void StartGame()
     {
-        SceneManager.LoadScene("Stage" + GameStart.Stage.ToString());
+        SceneManager.LoadScene("Main");
     }
     public void NextStage()
     {

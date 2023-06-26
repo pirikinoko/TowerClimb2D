@@ -36,7 +36,7 @@ public class Monster : MonoBehaviour
 
                 GameSystem.score += 15 * GameSystem.combo / 5;
                 GameSystem.combo++;
-                SoundEffect.KirarinTrigger = true;
+                SoundEffect.sound3Trigger = true;
                 Destroy(this.gameObject);
         }
     }

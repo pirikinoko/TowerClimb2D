@@ -5,7 +5,6 @@ using UnityEngine.UI;
 
 public class GameStart : MonoBehaviour
 {
-    public Text StageTX;
     public static int Stage, NumberOfStages = 1;
     public GameObject StartPanel;
     public static bool SPanelActive;
@@ -16,7 +15,6 @@ public class GameStart : MonoBehaviour
     }
     void Update()
     {
-        StageTX.text = Stage.ToString();
         PanelActive();
 
     }

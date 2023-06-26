@@ -10,9 +10,10 @@ public class GenerateStage : MonoBehaviour
     [SerializeField] GameObject[] frames;
     GameObject[] obj = new GameObject[objUnit];
     GameObject[] enemy = new GameObject[5];
+    GameObject[] objForCheckLength;
     const int Floor = 0, Wall = 1, Right = 0, Left = 1, objUnit = 30;
     const float rightLimit = 1.8f, leftLimit = -2.1f;
-    string [,] objNames = { { "Floor1", "Floor2", "Floor3", "Floor4" }, { "Wall1", "Wall2", "Wall3" , "Wall5"} };
+    string [,] objNames = { { "Floor1", "Floor2", "Floor3", "Floor4" }, { "Wall1", "Wall2", "Wall3" , "Wall4"} };
     float  [,] eachLength = new float[2,4];
     float xMax = 0, xMin = 0,  yMax = 0, yMin = 0, playerYPrev,  sizeX, sizeY, posX = -10, posY = 0;
     bool[] objActive = new bool[objUnit];
@@ -55,7 +56,7 @@ public class GenerateStage : MonoBehaviour
             frames[i].transform.localScale = frameSet[i + 4];
         }
         //オブジェクトを生成し長さを計測
-        GameObject[] objForCheckLength = new GameObject[totalObjects];
+        objForCheckLength = new GameObject[totalObjects];
         for(int j = 0; j < length1; j++)
         {
             for(int k = 0; k < length2; k++)
@@ -103,8 +104,10 @@ public class GenerateStage : MonoBehaviour
                 {
                     for(int j = 0; j < length2; j++)
                     {
-                        float distansFromRightFrame = (posX + (sizeX / 2)) - collisionPos[(i * 4) + j];
-                        eachLength[i, j] = sizeX - (distansFromRightFrame * 2);
+                        //衝突位置をもとにオブジェクトの長さを求める
+                        float distansFromRightFrame = (posX + (sizeX / 2)) - collisionPos[(i * 4) + j]; 
+                        eachLength[i, j] = sizeX - (distansFromRightFrame * 2);        
+                        Destroy(objForCheckLength[(i * 4) + j]);
                         Debug.Log(eachLength[i, j]);
                     }
                 }
@@ -146,7 +149,7 @@ public class GenerateStage : MonoBehaviour
         if(objLength == 4)
         {
             Vector3 enemyPos = objPos[targetNum];
-            enemyPos.y += 0.015f;
+            enemyPos.y += 0.008f;
             GameObject enemyObj = (GameObject)Resources.Load("slime");
             enemy[enemyCount] = Instantiate(enemyObj, enemyPos, Quaternion.identity);
             enemyCount++;
@@ -155,60 +158,20 @@ public class GenerateStage : MonoBehaviour
                 enemyCount = 0;
             }
         }
-        
     }
     void SetObjectPos(int targetNum)
     {
-        //一番最初のオブジェクトの位置
-        if(count == 0) 
+        //一番最初のオブジェクトの設定
+        if (count == 0)
         {
+            objectType[targetNum] = Floor;　//最初は床オブジェクトを生成
             objPos[targetNum] = new Vector3(1.0f, -3.8f, 0);
             objectType[0] = 0;
             return;
         }
-       
+
         //次に生成するオブジェクトの方向を決定
-        // 0か1が出る 
-        objDirection = Random.Range(0, 2); 
-        //ステージ範囲に収める
-         if(count > 1 && objPos[prev].x < leftLimit + 0.5f) 
-        {
-            objectType[targetNum] = 0;
-            objDirection = Right;
-        }
-        else if ( count > 1 && rightLimit - 0.5f < objPos[prev].x)
-        {
-            objectType[targetNum] = 0;
-            objDirection = Left;
-        }
-
-        if (count == 0) { objectType[targetNum] = 0; }
-
-        //前のオブジェクトとの距離
-        switch(objectType[targetNum])
-        {
-            case Floor: //床        
-            xMin = 0.5f; xMax = 0.8f;
-            yMin = 0.4f; yMax = 0.6f;
-            //壁→床の時
-            if (count >= 1 && objectType[prev] == Wall)
-            {
-                xMin = 0.6f; xMax = 0.9f;
-                yMin = 0.2f; yMax = 0.3f;
-            }
-                break;
-            case Wall:  //壁      
-            xMin = 0.6f; xMax = 0.8f;
-            yMin = 0.4f; yMax = 0.6f;
-            //床→壁の時
-            if (count >= 1 && objectType[prev] == Floor)
-            {
-                xMin = 0.7f; xMax = 0.9f;
-                yMin = 0.7f; yMax = 0.9f;
-            }
-                break;                            
-        }
-
+        objDirection = Random.Range(0, 2);  //0・・Left  1・・Right 
         //前のオブジェクトが壁の時壁ジャンプの方向にオブジェクトを生成
         if (objectType[prev] == Wall && count > 1)
         {
@@ -219,20 +182,92 @@ public class GenerateStage : MonoBehaviour
             else { objDirection = Right; }
         }
 
-        // 新しいオブジェクトの位置を計算
-        Vector3 newObjPos = new Vector3();
-        newObjPos.y = Random.Range(objPos[prev].y + yMin, objPos[prev].y + yMax);
-        if (objDirection == Right)
+        /*
+        //ステージ範囲に収める
+        if (count > 1 && objPos[prev].x < leftLimit + 0.3f)
         {
-            newObjPos.x = Random.Range(objPos[prev].x + xMin, objPos[prev].x + xMax);
+            objectType[targetNum] = 0;
+            objDirection = Right;
         }
-        else 
+        else if (count > 1 && rightLimit - 0.3f < objPos[prev].x)
         {
-            newObjPos.x = Random.Range(objPos[prev].x - xMin, objPos[prev].x - xMax);
+            objectType[targetNum] = 0;
+            objDirection = Left;
         }
+        */
 
-        newObjPos.x = Mathf.Clamp(newObjPos.x, leftLimit, rightLimit);
-        objPos[targetNum] = newObjPos;
+        while (true) 
+        {
+            //前のオブジェクトとの距離を設定
+            switch (objectType[targetNum])
+            {
+                case Floor: //床        
+                    xMin = 0.5f; xMax = 0.8f;
+                    yMin = 0.4f; yMax = 0.6f;
+                    //壁→床の時
+                    if (count >= 1 && objectType[prev] == Wall)
+                    {
+                        xMin = 0.6f; xMax = 0.9f;
+                        yMin = 0.2f; yMax = 0.3f;
+                    }
+                    xMin += 0.2f * eachLength[objectType[targetNum], objLength - 1];
+                    xMax += 0.2f * eachLength[objectType[targetNum], objLength - 1];
+                    break;
+                case Wall:  //壁      
+                    xMin = 0.6f; xMax = 0.8f;
+                    yMin = 0.4f; yMax = 0.6f;
+                    //床→壁の時
+                    if (count >= 1 && objectType[prev] == Floor)
+                    {
+                        xMin = 0.7f; xMax = 0.9f;
+                        yMin = 0.7f; yMax = 0.9f;
+                    }
+                    break;
+            }
+
+            // 新しいオブジェクトの位置を計算
+            Vector3 newObjPos = new Vector3();
+            newObjPos.y = Random.Range(objPos[prev].y + yMin, objPos[prev].y + yMax);
+            if (objDirection == Right)
+            {
+                newObjPos.x = Random.Range(objPos[prev].x + xMin, objPos[prev].x + xMax);
+            }
+            else
+            {
+                newObjPos.x = Random.Range(objPos[prev].x - xMin, objPos[prev].x - xMax);
+            }
+
+            if (newObjPos.x > rightLimit - (eachLength[objectType[targetNum], objLength - 1] / 2))
+            {
+                if(objectType[prev] == Wall) 
+                {
+                    objectType[targetNum] = Wall;
+                    objPos[targetNum] = newObjPos;
+                    break;
+                }
+                objDirection = Left;
+                objectType[targetNum] = Floor;
+            }
+            else if (newObjPos.x < leftLimit + (eachLength[objectType[targetNum], objLength - 1] / 2))
+            {
+                if (objectType[prev] == Wall)
+                {
+                    objectType[targetNum] = Wall;
+                    objPos[targetNum] = newObjPos;
+                    break;
+                }
+                objDirection = Right;
+                objectType[targetNum] = Floor;
+            }
+            else 
+            {
+                objPos[targetNum] = newObjPos;
+                break; 
+            }
+        }
+      
+        //newObjPos.x = Mathf.Clamp(newObjPos.x, leftLimit + eachLength[objectType[targetNum], objLength - 1], rightLimit - eachLength[objectType[targetNum], objLength - 1]);
+
     }
 
 

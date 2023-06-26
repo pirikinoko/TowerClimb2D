@@ -20,14 +20,14 @@ public class Collision : MonoBehaviour
                 {
                     GameSystem.score -= 5;
                     GameSystem.combo = 0;
-                    SoundEffect.DyukushiTrigger = true;
+                    SoundEffect.sound1Trigger = true;
                     Destroy(this.gameObject);
                 }   
 
                 if (this.gameObject.CompareTag("Surface"))
                 {
                     this.gameObject.GetComponent<Light2D>().intensity = 0;
-                    SoundEffect.KirarinTrigger = true;
+                    SoundEffect.sound3Trigger = true;
                     GameSystem.combo++;
                     GameSystem.score += 5 * GameSystem.combo / 5;
                     TimeScript.elapsedTime += 1;
@@ -36,14 +36,22 @@ public class Collision : MonoBehaviour
                 if (this.gameObject.CompareTag("Wall"))
                 {
                     this.gameObject.GetComponent<Light2D>().intensity = 0;
-                    SoundEffect.KirarinTrigger = true;
+                    SoundEffect.sound3Trigger = true;
                     GameSystem.combo++;
                     GameSystem.score += 15 * GameSystem.combo / 5;
                     TimeScript.elapsedTime += 1;
                     count++;
                 }
             }
-          
+            else if (count == 1)
+            {
+                if (this.gameObject.CompareTag("Wall") || this.gameObject.CompareTag("Surface"))
+                {
+                    SoundEffect.sound4Trigger = true;
+                    GameSystem.combo = 0;
+                }
+            }
+
         }
     }
     private void OnTriggerEnter2D(Collider2D other)

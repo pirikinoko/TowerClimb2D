@@ -23,7 +23,7 @@ public class TimeScript : MonoBehaviour
         startTime = 3f;
         startFlag = true;
         countDown.text = ("3");
-        SoundEffect.BunTrigger = true;
+        SoundEffect.sound2Trigger = true;
 
     }
 
@@ -63,7 +63,7 @@ public class TimeScript : MonoBehaviour
             }
             if (soundTime < 0)
             {
-                SoundEffect.BunTrigger = true;
+                SoundEffect.sound2Trigger = true;
                 soundTime = 1;
             }
         }

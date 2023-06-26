@@ -488,7 +488,6 @@ GameObject:
   - component: {fileID: 445389968}
   - component: {fileID: 445389971}
   - component: {fileID: 445389972}
-  - component: {fileID: 445389973}
   m_Layer: 0
   m_Name: GameSystem
   m_TagString: Untagged
@@ -583,23 +582,6 @@ MonoBehaviour:
   - {fileID: 635929870}
   - {fileID: 25631413}
   - {fileID: 1394215390}
---- !u!114 &445389973
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 445389967}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dbb693cf836155a47885c81f9d186075, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  up: {fileID: 0}
-  down: {fileID: 0}
-  left: {fileID: 0}
-  right: {fileID: 0}
-  checkLine: {fileID: 0}
 --- !u!1 &455088206
 GameObject:
   m_ObjectHideFlags: 0
@@ -12586,9 +12568,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b915129ad89b4f48b299acc147ab2ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Dyukushi: {fileID: 8300000, guid: 6c08022e96f97854cb5f67daf3f28627, type: 3}
-  Bun: {fileID: 8300000, guid: db98b7dd06c4bc241bbadf520583f04a, type: 3}
-  Kirarin: {fileID: 8300000, guid: 63c0352af2335184fbeca61a937f051d, type: 3}
+  sound1: {fileID: 8300000, guid: 6c08022e96f97854cb5f67daf3f28627, type: 3}
+  sound2: {fileID: 8300000, guid: db98b7dd06c4bc241bbadf520583f04a, type: 3}
+  sound3: {fileID: 8300000, guid: 63c0352af2335184fbeca61a937f051d, type: 3}
+  sound4: {fileID: 8300000, guid: b1820171525040748a243e1e6dda7993, type: 3}
 --- !u!4 &734923155
 Transform:
   m_ObjectHideFlags: 0
@@ -14961,7 +14944,7 @@ TilemapRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1947231843
   m_SortingLayer: 1
-  m_SortingOrder: 2
+  m_SortingOrder: 3
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 1.1, y: 0.25, z: 0}
   m_MaxChunkCount: 16

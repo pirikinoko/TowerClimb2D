@@ -64,7 +64,7 @@ public class GameSystem : MonoBehaviour
                 resultTime += TimeScript.pastTime / 1500;
                 if (resultTime >= TimeScript.pastTime)
                 {
-                    SoundEffect.BunTrigger = true;
+                    SoundEffect.sound2Trigger = true;
                 }
                 yield return new WaitForSeconds(0.3f);
             }
@@ -73,7 +73,7 @@ public class GameSystem : MonoBehaviour
                 resultScore += score / 1500;
                 if (resultScore == score)
                 {
-                    SoundEffect.BunTrigger = true;
+                    SoundEffect.sound1Trigger = true;
                 }
                yield return new WaitForSeconds(0.3f);
             }     

@@ -212,11 +212,17 @@ public class Player : MonoBehaviour
             rbody2D.velocity = new Vector2(0f, jumpForce);
             jumpCount++;
             speceKeyPressed = true;
-            animeState = "jumpUp";
         }
-         if(!onGround && playerspeed.y < 0 && !onWall)
+        if(!onGround && !onWall)
         {
-            animeState = "jumpDown";
+            if(playerspeed.y > 0) 
+            {
+                animeState = "jumpUp";
+            }
+            else 
+            {
+                animeState = "jumpDown";
+            }    
         }
         if (Input.GetKeyUp(KeyCode.Space))
         {
@@ -243,7 +249,7 @@ public class Player : MonoBehaviour
     void Attack() //攻撃処理
     {
         Vector2 colPos = this.transform.position;
-        if (Input.GetKeyDown(KeyCode.N) && !(isAttacking) &&  !isSlide)
+        if ((Input.GetKeyDown(KeyCode.N) || Input.GetMouseButtonDown(0))&& !(isAttacking) &&  !isSlide)
         {
             isAttacking = true;
             playerAnim.SetTrigger("attack");
@@ -262,7 +268,7 @@ public class Player : MonoBehaviour
             attackDuration = 1.0f;
         }
 
-        if (0.15f < attackDuration && attackDuration < 0.43f)   //攻撃の当たり判定ON
+        if (0.18f < attackDuration && attackDuration < 0.43f)   //攻撃の当たり判定ON
         {
             attackCol.gameObject.SetActive(true);
         }
