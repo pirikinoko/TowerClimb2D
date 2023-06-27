@@ -207,7 +207,7 @@ public class Player : MonoBehaviour
 
     void Jump()
     {   //地面にいるとき||壁に触れているとき
-        if (!isSlide && (Input.GetKeyDown(KeyCode.Space) && jumpCount == 0 && !onWall) || (!isSlide && Input.GetKeyDown(KeyCode.Space) && jumpCount == 1 && (wallflag || onWall)))
+        if (!isSlide && (Input.GetKeyDown(KeyCode.Space) && jumpCount == 0 && !onWall && playerspeed.y == 0) || (!isSlide && Input.GetKeyDown(KeyCode.Space) && jumpCount == 1 && (wallflag || onWall)))
         {
             rbody2D.velocity = new Vector2(0f, jumpForce);
             jumpCount++;
@@ -268,7 +268,7 @@ public class Player : MonoBehaviour
             attackDuration = 1.0f;
         }
 
-        if (0.18f < attackDuration && attackDuration < 0.43f)   //攻撃の当たり判定ON
+        if (0.25f < attackDuration && attackDuration < 0.43f)   //攻撃の当たり判定ON
         {
             attackCol.gameObject.SetActive(true);
         }
@@ -282,7 +282,7 @@ public class Player : MonoBehaviour
 
     void Ctrl()
     {
-        if (!isAttacking && onGround && Input.GetKeyDown(KeyCode.LeftControl)) 
+        if (!isAttacking && onGround && (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.M))) 
         {
             col2d.size = new Vector2(1, 1.8f);
             if (playerspeed.x < 0 || 0 < playerspeed.x)
@@ -296,7 +296,7 @@ public class Player : MonoBehaviour
                 animeState = "crouch";
             }
         }
-        if (isCrouch && Input.GetKeyUp(KeyCode.LeftControl))
+        if (isCrouch && Input.GetKeyUp(KeyCode.LeftControl) || Input.GetKeyUp(KeyCode.M))
         {
             col2d.size = defaultSize;
             isCrouch = false;

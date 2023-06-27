@@ -13,9 +13,10 @@ GameObject:
   - component: {fileID: 4797624726030254738}
   - component: {fileID: -8299122259163461188}
   - component: {fileID: -7570035926917663404}
+  - component: {fileID: 5141360463256782088}
   m_Layer: 0
   m_Name: slime
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -97,8 +98,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19137aac608d1674b8cf49a6e7d2a985, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rightLimit: 0.5
-  leftLimit: 0.5
+  rightLimit: 0.4
+  leftLimit: 0.4
 --- !u!50 &-8299122259163461188
 Rigidbody2D:
   serializedVersion: 4
@@ -146,3 +147,15 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 21.397728, y: 13.686989}
   m_EdgeRadius: 0
+--- !u!114 &5141360463256782088
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4195184891604585633}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92fc664a050af3644bea68a61363fd46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

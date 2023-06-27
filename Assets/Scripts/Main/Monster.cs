@@ -57,6 +57,7 @@ public class Monster : MonoBehaviour
     void Turn()
     {      
         Speed *= -1;
+        MonsterPos.x += Speed * Time.deltaTime;
         Vector2  characterDirection = gameObject.transform.localScale;
         characterDirection.x *= -1;
         gameObject.transform.localScale = characterDirection; 

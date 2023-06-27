@@ -145,11 +145,10 @@ public class GenerateStage : MonoBehaviour
         obj[targetNum] = Instantiate(prefabObj, objPos[targetNum], Quaternion.identity);
         obj[targetNum].name = objNames[objectType[targetNum] , objLength - 1] + "-" + targetNum.ToString(); 
 
-        
-        if(objLength == 4)
+        if(objectType[targetNum] == Floor && objLength == 4)
         {
             Vector3 enemyPos = objPos[targetNum];
-            enemyPos.y += 0.008f;
+            enemyPos.y += 0.005f;
             GameObject enemyObj = (GameObject)Resources.Load("slime");
             enemy[enemyCount] = Instantiate(enemyObj, enemyPos, Quaternion.identity);
             enemyCount++;
@@ -182,20 +181,6 @@ public class GenerateStage : MonoBehaviour
             else { objDirection = Right; }
         }
 
-        /*
-        //ステージ範囲に収める
-        if (count > 1 && objPos[prev].x < leftLimit + 0.3f)
-        {
-            objectType[targetNum] = 0;
-            objDirection = Right;
-        }
-        else if (count > 1 && rightLimit - 0.3f < objPos[prev].x)
-        {
-            objectType[targetNum] = 0;
-            objDirection = Left;
-        }
-        */
-
         while (true) 
         {
             //前のオブジェクトとの距離を設定
@@ -203,15 +188,17 @@ public class GenerateStage : MonoBehaviour
             {
                 case Floor: //床        
                     xMin = 0.5f; xMax = 0.8f;
-                    yMin = 0.4f; yMax = 0.6f;
+                    yMin = 0.55f; yMax = 0.65f;
                     //壁→床の時
                     if (count >= 1 && objectType[prev] == Wall)
                     {
                         xMin = 0.6f; xMax = 0.9f;
-                        yMin = 0.2f; yMax = 0.3f;
+                        yMin = 0.3f; yMax = 0.4f;
+                        yMin -= 0.1f * eachLength[objectType[targetNum], objLength - 1];
+                        yMax -= 0.1f * eachLength[objectType[targetNum], objLength - 1];
                     }
-                    xMin += 0.2f * eachLength[objectType[targetNum], objLength - 1];
-                    xMax += 0.2f * eachLength[objectType[targetNum], objLength - 1];
+                    xMin += 0.3f * eachLength[objectType[targetNum], objLength - 1];
+                    xMax += 0.3f * eachLength[objectType[targetNum], objLength - 1];
                     break;
                 case Wall:  //壁      
                     xMin = 0.6f; xMax = 0.8f;
@@ -239,25 +226,23 @@ public class GenerateStage : MonoBehaviour
 
             if (newObjPos.x > rightLimit - (eachLength[objectType[targetNum], objLength - 1] / 2))
             {
+                objDirection = Left;
+                objectType[targetNum] = Floor;
                 if(objectType[prev] == Wall) 
                 {
                     objectType[targetNum] = Wall;
-                    objPos[targetNum] = newObjPos;
-                    break;
+                    objDirection = Right;
                 }
-                objDirection = Left;
-                objectType[targetNum] = Floor;
             }
             else if (newObjPos.x < leftLimit + (eachLength[objectType[targetNum], objLength - 1] / 2))
             {
+                objDirection = Right;
+                objectType[targetNum] = Floor;
                 if (objectType[prev] == Wall)
                 {
                     objectType[targetNum] = Wall;
-                    objPos[targetNum] = newObjPos;
-                    break;
+                    objDirection = Left;
                 }
-                objDirection = Right;
-                objectType[targetNum] = Floor;
             }
             else 
             {
@@ -265,8 +250,6 @@ public class GenerateStage : MonoBehaviour
                 break; 
             }
         }
-      
-        //newObjPos.x = Mathf.Clamp(newObjPos.x, leftLimit + eachLength[objectType[targetNum], objLength - 1], rightLimit - eachLength[objectType[targetNum], objLength - 1]);
 
     }
 

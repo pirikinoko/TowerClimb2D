@@ -509,7 +509,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timer: {fileID: 986114837}
   countDown: {fileID: 252754842}
-  setTime: 30
+  setTime: 15
 --- !u!114 &445389969
 MonoBehaviour:
   m_ObjectHideFlags: 0
