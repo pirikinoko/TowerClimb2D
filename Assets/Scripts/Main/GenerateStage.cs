@@ -143,14 +143,19 @@ public class GenerateStage : MonoBehaviour
     {
         GameObject prefabObj = (GameObject)Resources.Load(objNames[objectType[targetNum], objLength - 1]);
         obj[targetNum] = Instantiate(prefabObj, objPos[targetNum], Quaternion.identity);
-        obj[targetNum].name = objNames[objectType[targetNum] , objLength - 1] + "-" + targetNum.ToString(); 
+        string[] objDirectionName = {"Right", "Left"};
+        obj[targetNum].name = objNames[objectType[targetNum] , objLength - 1] + "-" + targetNum.ToString() + objDirectionName[objDirection]; 
 
         if(objectType[targetNum] == Floor && objLength == 4)
         {
             Vector3 enemyPos = objPos[targetNum];
+            Vector3 candlePos = enemyPos;
             enemyPos.y += 0.005f;
+            candlePos.y += 0.5f;
             GameObject enemyObj = (GameObject)Resources.Load("slime");
+            GameObject candleObj = (GameObject)Resources.Load("Candle");
             enemy[enemyCount] = Instantiate(enemyObj, enemyPos, Quaternion.identity);
+            Instantiate(candleObj, candlePos, Quaternion.identity);
             enemyCount++;
             if(enemyCount == 5) 
             {
@@ -188,7 +193,7 @@ public class GenerateStage : MonoBehaviour
             {
                 case Floor: //床        
                     xMin = 0.5f; xMax = 0.8f;
-                    yMin = 0.55f; yMax = 0.65f;
+                    yMin = 0.55f; yMax = 0.60f;
                     //壁→床の時
                     if (count >= 1 && objectType[prev] == Wall)
                     {
@@ -257,7 +262,7 @@ public class GenerateStage : MonoBehaviour
     void DeleteObject()
     {
         Vector3 playerPos = player.transform.position;
-        if (playerPos.y - objPos[target].y > 4 && obj[target] != null)
+        if (playerPos.y > 2.5f && playerPos.y - objPos[target].y > 4 && obj[target] != null)
         {
             deadLine = objPos[target].y;
             deadLine -= 3;

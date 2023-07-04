@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Monster : MonoBehaviour
 {
-    float Speed = 0.5f, jumpForce = 5f;
+    float Speed = 0.5f, jumpForce = 1.5f;
     public float rightLimit, leftLimit;
     Rigidbody2D rb2D;
     Vector2 characterDirection, MonsterPos, localScale, defaultPos;
@@ -16,17 +16,22 @@ public class Monster : MonoBehaviour
         defaultPos = this.transform.position;
         MonsterPos = this.transform.position;
         Vector2 characterDirection = new Vector2(0.01f, 0.01f);
+        rb2D = this.GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per dadaDadad
     void Update()
     {
         MonsterPos.x += Speed * Time.deltaTime;
-        this.transform.position = MonsterPos;
         if (MonsterPos.x >= defaultPos.x + rightLimit || MonsterPos.x < defaultPos.x - leftLimit)
         {
             Turn();
         }
+        int rnd = Random.Range(0, 50);
+        if(rnd == 0){ Jump();}
+        Vector2 nowvelocity = rb2D.velocity;
+        this.transform.position = MonsterPos;
+        rb2D.velocity = nowvelocity;
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -46,12 +51,14 @@ public class Monster : MonoBehaviour
         onSurface = true;
     }
 
-    void Jump()　//ジャンプ
+    void Jump()//ジャンプ
     {
         if (onSurface)
         {
+            Debug.Log("Jump" + onSurface);
             rb2D.velocity = new Vector2(0, jumpForce);
             onSurface = false;
+
         }
     }
     void Turn()

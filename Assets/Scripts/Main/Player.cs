@@ -19,11 +19,10 @@ public class Player : MonoBehaviour
     public float  speed, jumpForce;
     float Gravity = 3000, elapsedTime, wallJumpTime, attackSign, attackDuration = 1.0f, slideDuration;
     [HideInInspector] public string animeState = "idle", wallName;
-    [HideInInspector] public bool onGround, legOnGround,  wallflag = false, jumpFlag = false, onWall, isMoving = false, isAttacking = false, isCrouch = false, isSlide = false, speceKeyPressed = false;
+    [HideInInspector] public bool autoWallJump = true, onGround, legOnGround,  wallflag = false, jumpFlag = false, onWall, isMoving = false, isAttacking = false, isCrouch = false, isSlide = false, speceKeyPressed = false;
     [HideInInspector] public int jumpCount = 0;
     Vector3 latestPos , playerPos;
-    Vector2 playerspeed;
-    Vector2 defaultSize;
+    Vector2 playerspeed,defaultSize;
  
     void Start()
     {
@@ -100,10 +99,7 @@ public class Player : MonoBehaviour
                 wallflag = false;
                 onGround = true;
             }
-       
         }
-           
-
     }
     private void OnCollisionExit2D(Collision2D other)
     {
@@ -209,7 +205,13 @@ public class Player : MonoBehaviour
     {   //地面にいるとき||壁に触れているとき
         if (!isSlide && (Input.GetKeyDown(KeyCode.Space) && jumpCount == 0 && !onWall && playerspeed.y == 0) || (!isSlide && Input.GetKeyDown(KeyCode.Space) && jumpCount == 1 && (wallflag || onWall)))
         {
-            rbody2D.velocity = new Vector2(0f, jumpForce);
+            if(jumpCount == 1 && autoWallJump)
+            {
+                if(wallName.Contains("Left")){rbody2D.velocity = new Vector2(0.8f, jumpForce);}
+                else{rbody2D.velocity = new Vector2(-0.8f, jumpForce);}
+            }
+            else { rbody2D.velocity = new Vector2(0f, jumpForce); }
+            
             jumpCount++;
             speceKeyPressed = true;
         }
