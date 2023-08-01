@@ -7,7 +7,7 @@ using System;
 public class GameSystem : MonoBehaviour
 {
     public Text scoreText, comboText, resultScoreTx, resultTimeTx, rankTx;
-    public GameObject scoreTextGO, comboTextGO, player, resultPanel,goalLine;
+    public GameObject scoreTextGO, comboTextGO, player, resultPanel;
     public static int combo;
     float scoreDisplay;
     public static float resultTime, resultScore , score;

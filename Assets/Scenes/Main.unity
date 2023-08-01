@@ -531,7 +531,6 @@ MonoBehaviour:
   comboTextGO: {fileID: 274654081}
   player: {fileID: 1458599069}
   resultPanel: {fileID: 1421587984}
-  goalLine: {fileID: 0}
 --- !u!4 &445389970
 Transform:
   m_ObjectHideFlags: 0
@@ -13015,7 +13014,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1004466033
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13521,7 +13520,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb6a6c5e5a6944f80bef7cf08e9e5a02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timerFrame: {fileID: 0}
+  timerFrame: {fileID: 1627095017}
 --- !u!212 &1336566807
 SpriteRenderer:
   m_ObjectHideFlags: 0

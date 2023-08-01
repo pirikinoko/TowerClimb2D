@@ -58,8 +58,7 @@ public class Player : MonoBehaviour
             PlayerSpeed();
             PlayAnim();
             Attack();
-        }
-        DebugText.text = "onGround: " + onGround ;
+        }   
     }
 
 
@@ -124,11 +123,13 @@ public class Player : MonoBehaviour
         playerPos = this.transform.position;
         playerspeed = ((playerPos - latestPos) / Time.deltaTime);
         latestPos = playerPos;
+        //DebugText.text = (playerspeed.x).ToString();
         //落下速度調整      
         if (playerspeed.y < -3.5f)
         {
             rbody2D.velocity = new Vector2(0, -3.5f);
         }
+
     }
     void Move()
     {
@@ -205,13 +206,15 @@ public class Player : MonoBehaviour
     {   //地面にいるとき||壁に触れているとき
         if (!isSlide && (Input.GetKeyDown(KeyCode.Space) && jumpCount == 0 && !onWall && playerspeed.y == 0) || (!isSlide && Input.GetKeyDown(KeyCode.Space) && jumpCount == 1 && (wallflag || onWall)))
         {
+            /*
             if(jumpCount == 1 && autoWallJump)
             {
                 if(wallName.Contains("Left")){rbody2D.velocity = new Vector2(0.8f, jumpForce);}
                 else{rbody2D.velocity = new Vector2(-0.8f, jumpForce);}
             }
             else { rbody2D.velocity = new Vector2(0f, jumpForce); }
-            
+            */
+            rbody2D.velocity = new Vector2(0f, jumpForce);
             jumpCount++;
             speceKeyPressed = true;
         }
