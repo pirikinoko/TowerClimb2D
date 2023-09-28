@@ -26,11 +26,6 @@ public class Collision : MonoBehaviour
                     TimeScript.elapsedTime += 1;
                     count++;
                 }
-                else if (count == 1)
-                {
-                    SoundEffect.sound4Trigger = true;
-                    GameSystem.combo = 0;
-                }
 
             }
            
@@ -44,11 +39,6 @@ public class Collision : MonoBehaviour
                     GameSystem.score += 5 * GameSystem.combo / 5;
                     TimeScript.elapsedTime += 1;
                     count++;
-                }
-                else if(count == 1)
-                {
-                    SoundEffect.sound4Trigger = true;
-                    GameSystem.combo = 0;
                 }
             }
             if (this.gameObject.CompareTag("Enemy"))

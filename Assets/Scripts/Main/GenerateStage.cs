@@ -144,7 +144,7 @@ public class GenerateStage : MonoBehaviour
         GameObject prefabObj = (GameObject)Resources.Load(objNames[objectType[targetNum], objLength - 1]);
         obj[targetNum] = Instantiate(prefabObj, objPos[targetNum], Quaternion.identity);
         string[] objDirectionName = {"Right", "Left"};
-        obj[targetNum].name = objNames[objectType[targetNum] , objLength - 1] + "-" + targetNum.ToString() + objDirectionName[objDirection]; 
+        obj[targetNum].name = objNames[objectType[targetNum] , objLength - 1]  + objDirectionName[objDirection] + "-" + targetNum.ToString(); 
 
         if(objectType[targetNum] == Floor && objLength == 4)
         {

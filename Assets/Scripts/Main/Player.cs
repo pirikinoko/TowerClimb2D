@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Tilemaps;
+using System;
 
 public class Player : MonoBehaviour
 {
@@ -14,18 +15,20 @@ public class Player : MonoBehaviour
     BoxCollider2D legCol2d, col2d;
     public static Vector2 characterDirection;
     public Tilemap tilemap;
-    public Text DebugText;
+    public Text DebugText, avgSpeedYText;
     public Vector2 defaultPos;
     public float  speed, jumpForce;
-    float Gravity = 3000, elapsedTime, wallJumpTime, attackSign, attackDuration = 1.0f, slideDuration;
+    float Gravity = 3000, elapsedTime, wallJumpTime, attackSign, attackDuration = 1.0f, slideDuration, sumSpeedY, avgSpeedY, lastTIme;
     [HideInInspector] public string animeState = "idle", wallName;
     [HideInInspector] public bool autoWallJump = true, onGround, legOnGround,  wallflag = false, jumpFlag = false, onWall, isMoving = false, isAttacking = false, isCrouch = false, isSlide = false, speceKeyPressed = false;
-    [HideInInspector] public int jumpCount = 0;
+    [HideInInspector] public int jumpCount = 0, lastNum;
     Vector3 latestPos , playerPos;
-    Vector2 playerspeed,defaultSize;
+    Vector2 playerSpeed,defaultSize;
  
     void Start()
     {
+        lastTIme = 0;
+        lastNum = 0;
         player = this.gameObject;
         col2d = this.GetComponent<BoxCollider2D>();
         defaultSize = col2d.size;
@@ -72,6 +75,15 @@ public class Player : MonoBehaviour
                 onWall = true;
             }
         }
+        for(int i = 0; i < 30; i++)
+        {
+            if(other.gameObject.name.Contains("-" + i))
+            {
+                //コンボを０にする処理 
+                lastNum = i;
+            }
+        }  
+       
     }
 
     //床に触れている間ジャンプカウントリセット
@@ -121,11 +133,21 @@ public class Player : MonoBehaviour
     {
         //プレイヤー速度取得
         playerPos = this.transform.position;
-        playerspeed = ((playerPos - latestPos) / Time.deltaTime);
+        playerSpeed = ((playerPos - latestPos) / Time.deltaTime);
         latestPos = playerPos;
-        //DebugText.text = (playerspeed.x).ToString();
+        //平均速度
+        if((int)TimeScript.pastTime > lastTIme)
+        {
+            sumSpeedY += playerSpeed.y;
+            lastTIme++;
+        }
+        avgSpeedY = sumSpeedY / TimeScript.pastTime;
+        avgSpeedY *= 5;
+        avgSpeedYText.text = String.Format("{0:##.#}", avgSpeedY)  + "m/s";
+
+
         //落下速度調整      
-        if (playerspeed.y < -3.5f)
+        if (playerSpeed.y < -3.5f)
         {
             rbody2D.velocity = new Vector2(0, -3.5f);
         }
@@ -155,7 +177,7 @@ public class Player : MonoBehaviour
         if (Input.GetKey(KeyCode.A))
         {
             position.x -= speed * Time.deltaTime;
-            if (speceKeyPressed == false && playerspeed.y < 0)
+            if (speceKeyPressed == false && playerSpeed.y < 0)
             {
                 if (onWall) { rbody2D.velocity = new Vector2(0, -0.5f);   }               
             }
@@ -176,7 +198,7 @@ public class Player : MonoBehaviour
          else if (Input.GetKey(KeyCode.D))
         {
             position.x += speed * Time.deltaTime;
-            if (speceKeyPressed == false && playerspeed.y < 0)
+            if (speceKeyPressed == false && playerSpeed.y < 0)
             {
                 if (onWall) { rbody2D.velocity = new Vector2(0, -0.5f); }
             }
@@ -204,7 +226,7 @@ public class Player : MonoBehaviour
 
     void Jump()
     {   //地面にいるとき||壁に触れているとき
-        if (!isSlide && (Input.GetKeyDown(KeyCode.Space) && jumpCount == 0 && !onWall && playerspeed.y == 0) || (!isSlide && Input.GetKeyDown(KeyCode.Space) && jumpCount == 1 && (wallflag || onWall)))
+        if (!isSlide && (Input.GetKeyDown(KeyCode.Space) && jumpCount == 0 && !onWall && playerSpeed.y == 0) || (!isSlide && Input.GetKeyDown(KeyCode.Space) && jumpCount == 1 && (wallflag || onWall)))
         {
             /*
             if(jumpCount == 1 && autoWallJump)
@@ -220,7 +242,7 @@ public class Player : MonoBehaviour
         }
         if(!onGround && !onWall)
         {
-            if(playerspeed.y > 0) 
+            if(playerSpeed.y > 0) 
             {
                 animeState = "jumpUp";
             }
@@ -232,7 +254,7 @@ public class Player : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.Space))
         {
             speceKeyPressed = false;
-            if (playerspeed.y > 0)
+            if (playerSpeed.y > 0)
             {
                 rbody2D.velocity = new Vector2(0, 0.5f);
             }
@@ -290,7 +312,7 @@ public class Player : MonoBehaviour
         if (!isAttacking && onGround && (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.M))) 
         {
             col2d.size = new Vector2(1, 1.8f);
-            if (playerspeed.x < 0 || 0 < playerspeed.x)
+            if (playerSpeed.x < 0 || 0 < playerSpeed.x)
             {
                 isSlide = true;
                 slideDuration = 0f;
