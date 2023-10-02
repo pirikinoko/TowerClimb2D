@@ -16,19 +16,24 @@ public class Player : MonoBehaviour
     public static Vector2 characterDirection;
     public Tilemap tilemap;
     public Text DebugText, avgSpeedYText;
+    public static float avgSpeedY;
     public Vector2 defaultPos;
-    public float  speed, jumpForce;
-    float Gravity = 3000, elapsedTime, wallJumpTime, attackSign, attackDuration = 1.0f, slideDuration, sumSpeedY, avgSpeedY, lastTIme;
+    public float speed, jumpForce;
+    float Gravity = 3500, elapsedTime, wallJumpTime, attackSign, attackDuration = 1.0f, slideDuration, speedYGoal, lastTIme, updateTextPeriod;
     [HideInInspector] public string animeState = "idle", wallName;
-    [HideInInspector] public bool autoWallJump = true, onGround, legOnGround,  wallflag = false, jumpFlag = false, onWall, isMoving = false, isAttacking = false, isCrouch = false, isSlide = false, speceKeyPressed = false;
+    [HideInInspector] public bool autoWallJump = true, onGround, legOnGround, wallflag = false, jumpFlag = false, onWall, isMoving = false, isAttacking = false, isCrouch = false, isSlide = false, speceKeyPressed = false;
     [HideInInspector] public int jumpCount = 0, lastNum;
-    Vector3 latestPos , playerPos;
-    Vector2 playerSpeed,defaultSize;
- 
+    Vector3 latestPos, playerPos;
+    Vector2 playerSpeed, defaultSize;
+    float[] playerSpeedYRecord = new float[30];
+    int calcCount = 0;
+    const int nullNumber = -999;
     void Start()
     {
         lastTIme = 0;
         lastNum = 0;
+        calcCount = 0;
+        updateTextPeriod = 0.1f;
         player = this.gameObject;
         col2d = this.GetComponent<BoxCollider2D>();
         defaultSize = col2d.size;
@@ -39,6 +44,10 @@ public class Player : MonoBehaviour
         Transform myTransform = this.transform;
         latestPos = player.transform.position;
         this.transform.position = defaultPos;
+        for (int i = 0; i < playerSpeedYRecord.Length; i++)
+        {
+            playerSpeedYRecord[i] = nullNumber;
+        }
     }
 
     void Update()
@@ -48,7 +57,7 @@ public class Player : MonoBehaviour
         Vector3 legPos = playerPos; legPos.y -= 0.12f;
         legCol2d.transform.position = legPos;
         legCol2d.offset = new Vector2(0, 0);
-        if (isSlide) 
+        if (isSlide)
         {
             legCol2d.offset = new Vector2(0.04f, 1.6f);
         }
@@ -61,7 +70,7 @@ public class Player : MonoBehaviour
             PlayerSpeed();
             PlayAnim();
             Attack();
-        }   
+        }
     }
 
 
@@ -75,15 +84,15 @@ public class Player : MonoBehaviour
                 onWall = true;
             }
         }
-        for(int i = 0; i < 30; i++)
+        for (int i = 0; i < 30; i++)
         {
-            if(other.gameObject.name.Contains("-" + i))
+            if (other.gameObject.name.Contains("-" + i))
             {
                 //コンボを０にする処理 
                 lastNum = i;
             }
-        }  
-       
+        }
+
     }
 
     //床に触れている間ジャンプカウントリセット
@@ -118,7 +127,7 @@ public class Player : MonoBehaviour
         if (other.gameObject.CompareTag("Surface"))
         {
             jumpCount = 1;
-            onGround = false;       
+            onGround = false;
         }
         //壁から離れたとき
         if (other.gameObject.CompareTag("Wall"))
@@ -136,14 +145,43 @@ public class Player : MonoBehaviour
         playerSpeed = ((playerPos - latestPos) / Time.deltaTime);
         latestPos = playerPos;
         //平均速度
-        if((int)TimeScript.pastTime > lastTIme)
+        if ((int)TimeScript.pastTime > lastTIme) //１秒ごとの速度を配列に記録していく（最大10個）
         {
-            sumSpeedY += playerSpeed.y;
+            playerSpeedYRecord[calcCount] = playerSpeed.y;
             lastTIme++;
+            calcCount++;
+            if (calcCount == playerSpeedYRecord.Length) { calcCount = 0; }
         }
-        avgSpeedY = sumSpeedY / TimeScript.pastTime;
-        avgSpeedY *= 5;
-        avgSpeedYText.text = String.Format("{0:##.#}", avgSpeedY)  + "m/s";
+        //直近30秒間の平均速度を計算
+
+        speedYGoal = 0;
+        for (int i = 0; i < playerSpeedYRecord.Length; i++)
+        {
+            if (playerSpeedYRecord[i] != nullNumber)
+            {
+                speedYGoal += playerSpeedYRecord[i];
+            }
+        }
+        speedYGoal *= 3;
+        //流動的に数値を表示
+        if (avgSpeedY < speedYGoal)
+        {
+            avgSpeedY += speedYGoal * Time.deltaTime;
+        }
+        else if (avgSpeedY > speedYGoal)
+        {
+            avgSpeedY -= speedYGoal * Time.deltaTime;
+        }
+        //0.1秒ごとにテキスト更新 
+        updateTextPeriod -= Time.deltaTime;
+        if (updateTextPeriod < 0)
+        {
+            avgSpeedYText.text = String.Format("{0:##.#}", avgSpeedY) + "m/90s";
+            updateTextPeriod = 0.1f;
+        }
+
+
+
 
 
         //落下速度調整      
@@ -179,7 +217,7 @@ public class Player : MonoBehaviour
             position.x -= speed * Time.deltaTime;
             if (speceKeyPressed == false && playerSpeed.y < 0)
             {
-                if (onWall) { rbody2D.velocity = new Vector2(0, -0.5f);   }               
+                if (onWall) { rbody2D.velocity = new Vector2(0, -0.5f); }
             }
 
             if (jumpCount < 1 && !onWall && !(isSlide))//アニメーション
@@ -192,10 +230,10 @@ public class Player : MonoBehaviour
                 Vector2 direction = new Vector2(0.1f, 0.1f);
                 gameObject.transform.localScale = direction;
             }
-           
+
 
         }
-         else if (Input.GetKey(KeyCode.D))
+        else if (Input.GetKey(KeyCode.D))
         {
             position.x += speed * Time.deltaTime;
             if (speceKeyPressed == false && playerSpeed.y < 0)
@@ -215,12 +253,12 @@ public class Player : MonoBehaviour
             }
         }
 
-        if(isMoving && (Input.GetKeyUp(KeyCode.D) || Input.GetKeyUp(KeyCode.A)))
+        if (isMoving && (Input.GetKeyUp(KeyCode.D) || Input.GetKeyUp(KeyCode.A)))
         {
             isMoving = false;
             animeState = "idle";
         }
-        
+
         transform.position = position;
     }
 
@@ -240,16 +278,16 @@ public class Player : MonoBehaviour
             jumpCount++;
             speceKeyPressed = true;
         }
-        if(!onGround && !onWall)
+        if (!onGround && !onWall)
         {
-            if(playerSpeed.y > 0) 
+            if (playerSpeed.y > 0)
             {
                 animeState = "jumpUp";
             }
-            else 
+            else
             {
                 animeState = "jumpDown";
-            }    
+            }
         }
         if (Input.GetKeyUp(KeyCode.Space))
         {
@@ -276,7 +314,7 @@ public class Player : MonoBehaviour
     void Attack() //攻撃処理
     {
         Vector2 colPos = this.transform.position;
-        if ((Input.GetKeyDown(KeyCode.N) || Input.GetMouseButtonDown(0))&& !(isAttacking) &&  !isSlide)
+        if ((Input.GetKeyDown(KeyCode.N) || Input.GetMouseButtonDown(0)) && !(isAttacking) && !isSlide)
         {
             isAttacking = true;
             playerAnim.SetTrigger("attack");
@@ -295,7 +333,7 @@ public class Player : MonoBehaviour
             attackDuration = 1.0f;
         }
 
-        if (0.25f < attackDuration && attackDuration < 0.43f)   //攻撃の当たり判定ON
+        if (0.20f < attackDuration && attackDuration < 0.5f)   //攻撃の当たり判定ON
         {
             attackCol.gameObject.SetActive(true);
         }
@@ -309,7 +347,7 @@ public class Player : MonoBehaviour
 
     void Ctrl()
     {
-        if (!isAttacking && onGround && (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.M))) 
+        if (!isAttacking && onGround && (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.M)))
         {
             col2d.size = new Vector2(1, 1.8f);
             if (playerSpeed.x < 0 || 0 < playerSpeed.x)
@@ -334,9 +372,9 @@ public class Player : MonoBehaviour
         {
             col2d.size = new Vector2(1, 1.8f);
         }
- 
 
-        if(isSlide)
+
+        if (isSlide)
         {
             slideDuration += Time.deltaTime;
             animeState = "sliding";
@@ -376,5 +414,5 @@ public class Player : MonoBehaviour
     }
 }
 
-     
+
 
