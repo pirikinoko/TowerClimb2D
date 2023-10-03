@@ -22,8 +22,8 @@ public class GenerateStage : MonoBehaviour
     public float deadLine { get; set; }
     int[] objectType = new int[objUnit];
     int currentObj = 0, prev, prev2, count = 0, target = 0, tileY, objLength, objDirection = 0, enemyCount = 0, startCount;
-    public static float[] collisionPos = new float[30]; 
-  
+    public static float[] collisionPos = new float[30];
+    int deleteDuration = 5;
     // Start is called before the first frame update
     void Start()
     {
@@ -136,7 +136,8 @@ public class GenerateStage : MonoBehaviour
                 count++;
             }
         }
-      
+        if((int)TimeScript.pastTIme)
+        DeleteTiles(castleBack);
     }
     void GenerateObjects(int targetNum)
     {
@@ -303,6 +304,31 @@ public class GenerateStage : MonoBehaviour
         if(prev2 == -1)
         {
             prev2 = objUnit - 1;
+        }
+    }
+
+
+    void DeleteTiles(Tilemap tilemap)
+    {
+        Vector3 playerPos = player.transform.position;
+        float maxY = playerPos.y - 5;
+        // タイルの位置情報を取得
+        BoundsInt bounds = tilemap.cellBounds;
+
+        // Y 座標が閾値未満のタイルを検索して削除
+        for (int x = bounds.x; x < bounds.x + bounds.size.x; x++)
+        {
+            for (int y = bounds.y; y < bounds.y + bounds.size.y; y++)
+            {
+                Vector3Int cellPosition = new Vector3Int(x, y, 0);
+                Vector3 tileWorldPosition = tilemap.GetCellCenterWorld(cellPosition);
+
+                if (tileWorldPosition.y < maxY)
+                {
+                    // 条件を満たすタイルを削除
+                    tilemap.SetTile(cellPosition, null);
+                }
+            }
         }
     }
 }
