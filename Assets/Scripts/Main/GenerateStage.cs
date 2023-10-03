@@ -108,7 +108,6 @@ public class GenerateStage : MonoBehaviour
                         float distansFromRightFrame = (posX + (sizeX / 2)) - collisionPos[(i * 4) + j]; 
                         eachLength[i, j] = sizeX - (distansFromRightFrame * 2);        
                         Destroy(objForCheckLength[(i * 4) + j]);
-                        Debug.Log(eachLength[i, j]);
                     }
                 }
                 startCount++;

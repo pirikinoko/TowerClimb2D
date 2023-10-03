@@ -8,6 +8,7 @@ public class TimeScript : MonoBehaviour
 
     public Text timer;
     public Text countDown;
+    public GameObject loadAnimGO;
     public static float elapsedTime , playTime, pastTime, startTime = 3f; //操作用, 表示用, 総経過時間, カウントダウン
     public float setTime;
     float soundTime = 1f;
@@ -16,6 +17,7 @@ public class TimeScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        loadAnimGO.SetActive(true);
         playTime = setTime;
         elapsedTime = setTime;
         pastTime = 0;
@@ -31,6 +33,10 @@ public class TimeScript : MonoBehaviour
     void Update()
     {
         TimerStart();
+        if(pastTime > 10)
+        {
+            loadAnimGO.SetActive(false);
+        }
     }
     void TimerStart()
     {

@@ -33,6 +33,7 @@ public class Player : MonoBehaviour
         lastTIme = 0;
         lastNum = 0;
         calcCount = 0;
+        avgSpeedY = 0;
         updateTextPeriod = 0.1f;
         player = this.gameObject;
         col2d = this.GetComponent<BoxCollider2D>();
@@ -44,6 +45,7 @@ public class Player : MonoBehaviour
         Transform myTransform = this.transform;
         latestPos = player.transform.position;
         this.transform.position = defaultPos;
+        avgSpeedYText.text = "";
         for (int i = 0; i < playerSpeedYRecord.Length; i++)
         {
             playerSpeedYRecord[i] = nullNumber;
@@ -152,8 +154,7 @@ public class Player : MonoBehaviour
             calcCount++;
             if (calcCount == playerSpeedYRecord.Length) { calcCount = 0; }
         }
-        //直近30秒間の平均速度を計算
-
+        //直近30秒間で進んだ距離を計算
         speedYGoal = 0;
         for (int i = 0; i < playerSpeedYRecord.Length; i++)
         {
@@ -162,7 +163,19 @@ public class Player : MonoBehaviour
                 speedYGoal += playerSpeedYRecord[i];
             }
         }
-        speedYGoal *= 3;
+        if (speedYGoal == 0 || (int)TimeScript.pastTime < 10)
+        {
+            avgSpeedYText.text = "";
+            return;
+        }
+        if ((int)TimeScript.pastTime < 30)
+        {
+            speedYGoal *= 90 / (int)TimeScript.pastTime;
+        }
+        else
+        {
+            speedYGoal *= 3;
+        }
         //流動的に数値を表示
         if (avgSpeedY < speedYGoal)
         {

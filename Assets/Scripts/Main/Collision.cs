@@ -12,7 +12,9 @@ public class Collision : MonoBehaviour
     }
     private void OnCollisionEnter2D(Collision2D other)
     {
-
+        float scoreMultiBySpeed = Player.avgSpeedY / 16;
+        if(scoreMultiBySpeed < 1.0f) { scoreMultiBySpeed = 1.0f; }
+        Debug.Log(scoreMultiBySpeed);
         if (other.gameObject.CompareTag("Player"))
         {
             if (this.gameObject.CompareTag("Wall"))
@@ -22,7 +24,7 @@ public class Collision : MonoBehaviour
                     this.gameObject.GetComponent<Light2D>().intensity = 0;
                     SoundEffect.sound3Trigger = true;
                     GameSystem.combo++;
-                    GameSystem.score += 15 * GameSystem.combo / 5;
+                    GameSystem.score += 15 *( GameSystem.combo / 5) * (scoreMultiBySpeed);
                     TimeScript.elapsedTime += 1;
                     count++;
                 }
@@ -36,7 +38,7 @@ public class Collision : MonoBehaviour
                     this.gameObject.GetComponent<Light2D>().intensity = 0;
                     SoundEffect.sound3Trigger = true;
                     GameSystem.combo++;
-                    GameSystem.score += 5 * GameSystem.combo / 5;
+                    GameSystem.score += 5 * GameSystem.combo / 5 * (scoreMultiBySpeed);
                     TimeScript.elapsedTime += 1;
                     count++;
                 }
