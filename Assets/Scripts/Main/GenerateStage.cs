@@ -136,8 +136,14 @@ public class GenerateStage : MonoBehaviour
                 count++;
             }
         }
-        if((int)TimeScript.pastTIme)
-        DeleteTiles(castleBack);
+        if((int)TimeScript.pastTime > deleteDuration)
+        {
+            DeleteTiles(castleTile);
+            DeleteTiles(castleBack);
+            DeleteTiles(skyTile);
+            deleteDuration += 5;
+        }
+
     }
     void GenerateObjects(int targetNum)
     {
@@ -311,7 +317,7 @@ public class GenerateStage : MonoBehaviour
     void DeleteTiles(Tilemap tilemap)
     {
         Vector3 playerPos = player.transform.position;
-        float maxY = playerPos.y - 5;
+        float maxY = playerPos.y - 7;
         // タイルの位置情報を取得
         BoundsInt bounds = tilemap.cellBounds;
 
