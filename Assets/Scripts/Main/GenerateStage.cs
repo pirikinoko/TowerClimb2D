@@ -1,4 +1,4 @@
-using System.Collections;
+ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -15,15 +15,14 @@ public class GenerateStage : MonoBehaviour
     const float rightLimit = 1.8f, leftLimit = -2.1f;
     string [,] objNames = { { "Floor1", "Floor2", "Floor3", "Floor4" }, { "Wall1", "Wall2", "Wall3" , "Wall4"} };
     float  [,] eachLength = new float[2,4];
-    float xMax = 0, xMin = 0,  yMax = 0, yMin = 0, playerYPrev,  sizeX, sizeY, posX = -10, posY = 0;
+    float xMax = 0, xMin = 0, yMax = 0, yMin = 0, playerYPrev, sizeX, sizeY, posX = -10, posY = 0, difficulty = 30;
     bool[] objActive = new bool[objUnit];
     Vector3[] objPos = new Vector3[objUnit];
     Vector2 checkLinePos;
     public float deadLine { get; set; }
     int[] objectType = new int[objUnit];
-    int currentObj = 0, prev, prev2, count = 0, target = 0, tileY, objLength, objDirection = 0, enemyCount = 0, startCount;
+    int currentObj = 0, prev, prev2, count = 0, target = 0, tileY, objLength, objDirection = 0, enemyCount = 0, startCount, deleteDuration = 5;
     public static float[] collisionPos = new float[30];
-    int deleteDuration = 5;
     // Start is called before the first frame update
     void Start()
     {
@@ -82,6 +81,7 @@ public class GenerateStage : MonoBehaviour
         target = 0;
         enemyCount = 0;
         deadLine = -10;
+        difficulty = 0;
         for (int i = 0; i < 20; i++)
         {
             objActive[i] = false;
@@ -127,7 +127,17 @@ public class GenerateStage : MonoBehaviour
                 {
                     maxLength = 4;
                 }
-                objLength = Random.Range(1, maxLength + 1);
+                float rndTmp = Random.Range(0, ((100 / maxLength)  + difficulty) * maxLength);
+                float[] provbability = new float[maxLength];
+                for (int i = 0; i < maxLength; i++)
+                {
+                    provbability[i] = (100 / maxLength * (i + 1)) + difficulty * (i + 1);
+                    if (rndTmp < provbability[i]) 
+                    {
+                        objLength = maxLength - i;
+                        rndTmp = 99999;
+                    }
+                }
                 SetObjectPos(currentObj);
                 GenerateObjects(currentObj);
                 objActive[currentObj] = true;
