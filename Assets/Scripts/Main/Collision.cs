@@ -48,7 +48,6 @@ public class Collision : MonoBehaviour
                GameSystem.score -= 5;
                GameSystem.combo = 0;
                SoundEffect.sound1Trigger = true;
-               Debug.Log(other.gameObject.name + "と衝突しました");
                Destroy(this.gameObject);
             }   
         }

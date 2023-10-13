@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Monster : MonoBehaviour
 {
+    Player player;
     float Speed = 0.5f, jumpForce = 1.5f;
     public float rightLimit, leftLimit;
     Rigidbody2D rb2D;
@@ -28,7 +29,7 @@ public class Monster : MonoBehaviour
             Turn();
         }
         int rnd = Random.Range(0, 50);
-        if(rnd == 0){ Jump();}
+        if (rnd == 0) { Jump(); }
         Vector2 nowvelocity = rb2D.velocity;
         this.transform.position = MonsterPos;
         rb2D.velocity = nowvelocity;
@@ -39,10 +40,11 @@ public class Monster : MonoBehaviour
         if (other.gameObject.CompareTag("Wepon"))
         {
 
-                GameSystem.score += 15 * GameSystem.combo / 5;
-                GameSystem.combo++;
-                SoundEffect.sound3Trigger = true;
-                Destroy(this.gameObject);
+            GameSystem.score += 15 * GameSystem.combo / 5;
+            GameSystem.combo++;
+            player.physicalBuff = true;
+            SoundEffect.sound3Trigger = true;
+            Destroy(this.gameObject);
         }
     }
 
@@ -62,12 +64,12 @@ public class Monster : MonoBehaviour
         }
     }
     void Turn()
-    {      
+    {
         Speed *= -1;
         MonsterPos.x += Speed * Time.deltaTime;
-        Vector2  characterDirection = gameObject.transform.localScale;
+        Vector2 characterDirection = gameObject.transform.localScale;
         characterDirection.x *= -1;
-        gameObject.transform.localScale = characterDirection; 
+        gameObject.transform.localScale = characterDirection;
     }
 
 
