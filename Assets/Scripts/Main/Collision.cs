@@ -14,7 +14,6 @@ public class Collision : MonoBehaviour
     {
         float scoreMultiBySpeed = Player.avgSpeedY / 16;
         if(scoreMultiBySpeed < 1.0f) { scoreMultiBySpeed = 1.0f; }
-        Debug.Log(scoreMultiBySpeed);
         if (other.gameObject.CompareTag("Player"))
         {
             if (this.gameObject.CompareTag("Wall"))
@@ -26,6 +25,12 @@ public class Collision : MonoBehaviour
                     GameSystem.combo++;
                     GameSystem.score += 15 *( GameSystem.combo / 5) * (scoreMultiBySpeed);
                     TimeScript.elapsedTime += 1;
+                    Vector2 posTmp  = other.gameObject.transform.position;
+                    posTmp.x += 0.2f;
+                    posTmp.y += 0.2f;
+                    ScoreFeedBack.feedBackPos = posTmp;
+                    ScoreFeedBack.scoreDiff = 15 * (GameSystem.combo / 5) * (scoreMultiBySpeed);
+                    Debug.Log( (GameSystem.combo / 5));
                     count++;
                 }
 
@@ -40,6 +45,11 @@ public class Collision : MonoBehaviour
                     GameSystem.combo++;
                     GameSystem.score += 5 * GameSystem.combo / 5 * (scoreMultiBySpeed);
                     TimeScript.elapsedTime += 1;
+                    Vector2 posTmp = other.gameObject.transform.position;
+                    posTmp.x += 0.2f;
+                    posTmp.y += 0.2f;
+                    ScoreFeedBack.feedBackPos = posTmp;
+                    ScoreFeedBack.scoreDiff = 5 * GameSystem.combo / 5 * (scoreMultiBySpeed);
                     count++;
                 }
             }
@@ -48,6 +58,7 @@ public class Collision : MonoBehaviour
                GameSystem.score -= 5;
                GameSystem.combo = 0;
                SoundEffect.sound1Trigger = true;
+               Debug.Log(other.gameObject.name + "と衝突しました");
                Destroy(this.gameObject);
             }   
         }
