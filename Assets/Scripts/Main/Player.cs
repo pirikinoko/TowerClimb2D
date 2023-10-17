@@ -19,15 +19,16 @@ public class Player : MonoBehaviour
     public static float avgSpeedY;
     public Vector2 defaultPos;
     public float speed, jumpForce;
-    float Gravity = 3500, elapsedTime, wallJumpTime, attackSign, attackDuration = 1.0f, slideDuration, speedYGoal, lastTIme, updateTextPeriod;
+    float Gravity = 3500, elapsedTime, wallJumpTime, attackSign, attackDuration = 1.0f, slideDuration, speedYGoal, lastTIme, updateTextPeriod, physicalTime;
     [HideInInspector] public string animeState = "idle", wallName;
-    [HideInInspector] public bool autoWallJump = true, onGround, legOnGround, wallflag = false, jumpFlag = false, onWall, isMoving = false, isAttacking = false, isCrouch = false, isSlide = false, speceKeyPressed = false;
+    [HideInInspector] public bool autoWallJump = true, onGround, legOnGround, wallflag = false, physicalBuff = false, jumpFlag = false, onWall, isMoving = false, isAttacking = false, isCrouch = false, isSlide = false, speceKeyPressed = false;
     [HideInInspector] public int jumpCount = 0, lastNum;
     Vector3 latestPos, playerPos;
     Vector2 playerSpeed, defaultSize;
     float[] playerSpeedYRecord = new float[30];
     int calcCount = 0;
     const int nullNumber = -999;
+    float[] speedDefault = new float[2], jumpForceDefault = new float[2];
     void Start()
     {
         lastTIme = 0;
@@ -50,6 +51,10 @@ public class Player : MonoBehaviour
         {
             playerSpeedYRecord[i] = nullNumber;
         }
+        speedDefault[0] = speed;
+        speedDefault[1] = speed * 1.5f;
+        jumpForceDefault[0] = jumpForce;
+        jumpForceDefault[1] = jumpForce * 1.5f;
     }
 
     void Update()
@@ -412,7 +417,23 @@ public class Player : MonoBehaviour
         {
             // タイルが存在する場合、タイルのIDを取得
             int tileID = tile.GetInstanceID();
-            Debug.Log("Tile ID: " + tileID);
+        }
+    }
+
+    void PhysicalBuff()
+    {
+        if (physicalBuff)
+        {
+            physicalTime -= Time.deltaTime;
+            speed = speedDefault[1];
+            jumpForce = jumpForceDefault[1];
+            if (physicalTime < 0)
+            {
+                physicalBuff = false;
+                physicalTime = 5.0f;
+                speed = speedDefault[0];
+                jumpForce = jumpForceDefault[0];
+            }
         }
     }
     void PlayAnim()

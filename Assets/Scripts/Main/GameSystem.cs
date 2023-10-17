@@ -8,10 +8,9 @@ public class GameSystem : MonoBehaviour
 {
     public Text scoreText, comboText, resultScoreTx, resultTimeTx, rankTx;
     public GameObject scoreTextGO, comboTextGO, player, resultPanel;
-    public static int combo;
-    float scoreDisplay;
-    public static float resultTime, resultScore , score;
-    int stage1Goal = 5, lastCombo = 0;
+    float scoreDisplay, lastCombo = 0;
+    public static float resultTime, resultScore , score, combo;
+    int stage1Goal = 5;
     string rank;
     public static string gameState = "Playing";
     public static bool playable = true;
@@ -41,7 +40,7 @@ public class GameSystem : MonoBehaviour
         GameOver();
         Effect();
         scoreText.text = String.Format("{0:####}", scoreDisplay);
-        comboText.text = combo.ToString();
+        comboText.text = String.Format("{0:####}", combo);
     }
     void FixedUpdate()
     {

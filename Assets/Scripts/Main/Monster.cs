@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Monster : MonoBehaviour
 {
+    Player player;
     float Speed = 0.5f, jumpForce = 1.5f;
     public float rightLimit, leftLimit;
     Rigidbody2D rb2D;
@@ -17,6 +18,7 @@ public class Monster : MonoBehaviour
         MonsterPos = this.transform.position;
         Vector2 characterDirection = new Vector2(0.01f, 0.01f);
         rb2D = this.GetComponent<Rigidbody2D>();
+        player = GameObject.Find("Player").GetComponent<Player>();
     }
 
     // Update is called once per dadaDadad
@@ -42,7 +44,8 @@ public class Monster : MonoBehaviour
                 GameSystem.score += 15 * GameSystem.combo / 5;
                 GameSystem.combo++;
                 SoundEffect.sound3Trigger = true;
-                Destroy(this.gameObject);
+            player.physicalBuff = true;
+            Destroy(this.gameObject);
         }
     }
 
@@ -55,7 +58,6 @@ public class Monster : MonoBehaviour
     {
         if (onSurface)
         {
-            Debug.Log("Jump" + onSurface);
             rb2D.velocity = new Vector2(0, jumpForce);
             onSurface = false;
 
