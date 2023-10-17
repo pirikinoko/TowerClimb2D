@@ -5,17 +5,32 @@ using UnityEngine.UI;
 
 public class BuffManagement : MonoBehaviour
 {
-    public static bool[] buffTrigger = new bool[1];
-    public Sprite speedBuffImg;
-    public Image[] buffImg;
-    float[] buffTime = new float[1];
+    const int max = 1;
+    
+    public GameObject[] targetImage;
+    public Sprite[] buffIcon;
+
+    public static bool[] buffTrigger = new bool[max];
+    int[] callTime = new int[max]; 
+    float[] buffTime = new float[max];
+    float[] imageAlpha = new float[max];
+    Color[] imageColor = new Color[max];
     float[] setTime = { 5.0f };
+
+    int activeBuffNumber = 0;
     // Start is called before the first frame update
     void Start()
     {
-        for (int i = 0; i < buffTime.Length; i++)
+        activeBuffNumber = 0;
+        for (int i = 0; i < max; i++)
         {
             buffTime[i] = 0;
+            imageAlpha[i] = 0;
+            buffTrigger[i] = false;
+            imageColor[i] = targetImage[i].GetComponent<Image>().color;
+            imageColor[i].a = imageAlpha[i];
+            buffTime[i] = setTime[i];
+            targetImage[i].GetComponent<Image>().color = imageColor[i];
         }
     }
 
@@ -27,11 +42,29 @@ public class BuffManagement : MonoBehaviour
             if (buffTrigger[i]) 
             {
                 buffTime[i] -= Time.deltaTime;
-                if(buffTime[i] < 0) 
+
+                if (callTime[i] == 0)
+                {
+                    targetImage[activeBuffNumber].GetComponent<Image>().sprite = buffIcon[i];
+                    callTime[i] = 1;
+                    imageAlpha[activeBuffNumber] = 1.0f;
+                    activeBuffNumber++;
+                }
+
+                if (buffTime[i] < 0) 
                 {
                     buffTrigger[i] = false;
                     buffTime[i] = setTime[i];
+                    callTime[i] = 0;
+                    activeBuffNumber--;
                 }
+            }
+
+            for (int j = 0; j < activeBuffNumber; j++)
+            {
+                imageAlpha[j] -= Time.deltaTime / setTime[i];
+                imageColor[j].a = imageAlpha[j];
+                targetImage[j].GetComponent<Image>().color = imageColor[i];
             }
         }
     }

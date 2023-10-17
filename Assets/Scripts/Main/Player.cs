@@ -9,8 +9,10 @@ public class Player : MonoBehaviour
 {
     GameObject player;
     public Rigidbody2D rbody2D;
+    [HideInInspector] public string animeState = "idle", wallName;
+    [HideInInspector] public bool autoWallJump = true, onGround, legOnGround, wallflag = false, jumpFlag = false, onWall, isMoving = false, isAttacking = false, isCrouch = false, isSlide = false, speceKeyPressed = false;
+    [HideInInspector] public int jumpCount = 0, lastNum;
     [SerializeField] GameObject attackCol;
-    [SerializeField]
     private Animator playerAnim;
     BoxCollider2D legCol2d, col2d;
     public static Vector2 characterDirection;
@@ -20,9 +22,7 @@ public class Player : MonoBehaviour
     public Vector2 defaultPos;
     public float speed, jumpForce;
     float Gravity = 3500, elapsedTime, wallJumpTime, attackSign, attackDuration = 1.0f, slideDuration, speedYGoal, lastTIme, updateTextPeriod;
-    [HideInInspector] public string animeState = "idle", wallName;
-    [HideInInspector] public bool autoWallJump = true, onGround, legOnGround, wallflag = false, physicalBuff = false, jumpFlag = false, onWall, isMoving = false, isAttacking = false, isCrouch = false, isSlide = false, speceKeyPressed = false;
-    [HideInInspector] public int jumpCount = 0, lastNum;
+   
     Vector3 latestPos, playerPos;
     Vector2 playerSpeed, defaultSize;
     float[] playerSpeedYRecord = new float[30];
@@ -38,6 +38,7 @@ public class Player : MonoBehaviour
         updateTextPeriod = 0.1f;
         player = this.gameObject;
         col2d = this.GetComponent<BoxCollider2D>();
+        playerAnim = this.GetComponent<Animator>();
         defaultSize = col2d.size;
         legCol2d = transform.GetChild(0).gameObject.GetComponent<BoxCollider2D>();
         //Rigidbodyを取得
@@ -76,6 +77,7 @@ public class Player : MonoBehaviour
             Ctrl();
             PlayerSpeed();
             PlayAnim();
+            PhysicalBuff();
             Attack();
         }
     }

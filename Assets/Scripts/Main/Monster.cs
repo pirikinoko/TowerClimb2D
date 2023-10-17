@@ -41,10 +41,10 @@ public class Monster : MonoBehaviour
         if (other.gameObject.CompareTag("Wepon"))
         {
 
-                GameSystem.score += 15 * GameSystem.combo / 5;
-                GameSystem.combo++;
-                SoundEffect.sound3Trigger = true;
-            player.physicalBuff = true;
+            GameSystem.score += 15 * GameSystem.combo / 5;
+            GameSystem.combo++;
+            SoundEffect.sound3Trigger = true;
+            BuffManagement.buffTrigger[0] = true;
             Destroy(this.gameObject);
         }
     }
