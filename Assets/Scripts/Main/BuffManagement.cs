@@ -20,6 +20,6 @@ public class BuffManagement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        buffTime[0]  = ;
     }
 }
