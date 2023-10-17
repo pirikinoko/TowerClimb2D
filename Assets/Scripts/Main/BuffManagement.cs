@@ -5,9 +5,11 @@ using UnityEngine.UI;
 
 public class BuffManagement : MonoBehaviour
 {
+    public static bool[] buffTrigger = new bool[1];
     public Sprite speedBuffImg;
     public Image[] buffImg;
-    public static float[] buffTime = new float[1];
+    float[] buffTime = new float[1];
+    float[] setTime = { 5.0f };
     // Start is called before the first frame update
     void Start()
     {
@@ -20,6 +22,17 @@ public class BuffManagement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        buffTime[0]  = ;
+        for (int i = 0; i < buffTime.Length; i++)
+        {
+            if (buffTrigger[i]) 
+            {
+                buffTime[i] -= Time.deltaTime;
+                if(buffTime[i] < 0) 
+                {
+                    buffTrigger[i] = false;
+                    buffTime[i] = setTime[i];
+                }
+            }
+        }
     }
 }

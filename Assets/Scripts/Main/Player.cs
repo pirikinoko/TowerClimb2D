@@ -19,7 +19,7 @@ public class Player : MonoBehaviour
     public static float avgSpeedY;
     public Vector2 defaultPos;
     public float speed, jumpForce;
-    float Gravity = 3500, elapsedTime, wallJumpTime, attackSign, attackDuration = 1.0f, slideDuration, speedYGoal, lastTIme, updateTextPeriod, physicalTime;
+    float Gravity = 3500, elapsedTime, wallJumpTime, attackSign, attackDuration = 1.0f, slideDuration, speedYGoal, lastTIme, updateTextPeriod;
     [HideInInspector] public string animeState = "idle", wallName;
     [HideInInspector] public bool autoWallJump = true, onGround, legOnGround, wallflag = false, physicalBuff = false, jumpFlag = false, onWall, isMoving = false, isAttacking = false, isCrouch = false, isSlide = false, speceKeyPressed = false;
     [HideInInspector] public int jumpCount = 0, lastNum;
@@ -422,18 +422,15 @@ public class Player : MonoBehaviour
 
     void PhysicalBuff()
     {
-        if (physicalBuff)
+        if (BuffManagement.buffTrigger[0])
         {
-            physicalTime -= Time.deltaTime;
             speed = speedDefault[1];
             jumpForce = jumpForceDefault[1];
-            if (physicalTime < 0)
-            {
-                physicalBuff = false;
-                physicalTime = 5.0f;
-                speed = speedDefault[0];
-                jumpForce = jumpForceDefault[0];
-            }
+        }
+        else 
+        {
+            speed = speedDefault[0];
+            jumpForce = jumpForceDefault[0];
         }
     }
     void PlayAnim()
