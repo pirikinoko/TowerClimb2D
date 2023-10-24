@@ -15,7 +15,7 @@ public class BuffManagement : MonoBehaviour
     float[] buffTime = new float[max];
     float[] imageAlpha = new float[max];
     Color[] imageColor = new Color[max];
-    float[] setTime = { 5.0f };
+    float[] setTime = { 5.0f , 5.0f};
 
     int activeBuffNumber = 0;
     // Start is called before the first frame update
@@ -24,7 +24,6 @@ public class BuffManagement : MonoBehaviour
         activeBuffNumber = 0;
         for (int i = 0; i < max; i++)
         {
-            buffTime[i] = 0;
             imageAlpha[i] = 0;
             buffTrigger[i] = false;
             imageColor[i] = targetImage[i].GetComponent<Image>().color;

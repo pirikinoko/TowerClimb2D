@@ -11,7 +11,7 @@ public class GenerateStage : MonoBehaviour
     GameObject[] obj = new GameObject[objUnit];
     GameObject[] enemy = new GameObject[5];
     GameObject[] objForCheckLength;
-    const int Floor = 0, Wall = 1, Right = 0, Left = 1, objUnit = 30;
+    const int Floor = 0, Wall = 1, Right = 0, Left = 1, objUnit = 30, nullNumber = 99999;
     const float rightLimit = 1.8f, leftLimit = -2.1f;
     string [,] objNames = { { "Floor1", "Floor2", "Floor3", "Floor4" }, { "Wall1", "Wall2", "Wall3" , "Wall4"} };
     float  [,] eachLength = new float[2,4];
@@ -135,7 +135,7 @@ public class GenerateStage : MonoBehaviour
                     if (rndTmp < provbability[i]) 
                     {
                         objLength = maxLength - i;
-                        rndTmp = 99999;
+                        rndTmp = nullNumber;
                     }
                 }
                 SetObjectPos(currentObj);

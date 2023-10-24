@@ -5,6 +5,7 @@ using UnityEngine.Experimental.Rendering.Universal;
 public class Collision : MonoBehaviour
 {
     int count = 0;
+    const int scoreBased = 5;
     // Start is called before the first frame update
     void Start()
     {
@@ -23,13 +24,18 @@ public class Collision : MonoBehaviour
                     this.gameObject.GetComponent<Light2D>().intensity = 0;
                     SoundEffect.sound3Trigger = true;
                     GameSystem.combo++;
-                    GameSystem.score += 15 *( GameSystem.combo / 5) * (scoreMultiBySpeed);
+                    float buffMulti = 1.0f;
+                    if (BuffManagement.buffTrigger[0])
+                    {
+                        buffMulti = 3.0f;
+                    }
+                    GameSystem.score += scoreBased * 3 *( GameSystem.combo / 5) * (scoreMultiBySpeed) * buffMulti;
                     TimeScript.elapsedTime += 1;
                     Vector2 posTmp  = other.gameObject.transform.position;
                     posTmp.x += 0.2f;
                     posTmp.y += 0.2f;
                     ScoreFeedBack.feedBackPos = posTmp;
-                    ScoreFeedBack.scoreDiff = 15 * (GameSystem.combo / 5) * (scoreMultiBySpeed);
+                    ScoreFeedBack.scoreDiff = scoreBased * 3 * (GameSystem.combo / 5) * (scoreMultiBySpeed) * buffMulti;
                     Debug.Log( (GameSystem.combo / 5));
                     count++;
                 }
@@ -43,13 +49,18 @@ public class Collision : MonoBehaviour
                     this.gameObject.GetComponent<Light2D>().intensity = 0;
                     SoundEffect.sound3Trigger = true;
                     GameSystem.combo++;
-                    GameSystem.score += 5 * GameSystem.combo / 5 * (scoreMultiBySpeed);
+                    float buffMulti = 1.0f;
+                    if (BuffManagement.buffTrigger[0])
+                    {
+                        buffMulti = 3.0f;
+                    }
+                    GameSystem.score += scoreBased * GameSystem.combo / 5 * (scoreMultiBySpeed) * buffMulti;
                     TimeScript.elapsedTime += 1;
                     Vector2 posTmp = other.gameObject.transform.position;
                     posTmp.x += 0.2f;
                     posTmp.y += 0.2f;
                     ScoreFeedBack.feedBackPos = posTmp;
-                    ScoreFeedBack.scoreDiff = 5 * GameSystem.combo / 5 * (scoreMultiBySpeed);
+                    ScoreFeedBack.scoreDiff = scoreBased * GameSystem.combo / 5 * (scoreMultiBySpeed) * buffMulti;
                     count++;
                 }
             }

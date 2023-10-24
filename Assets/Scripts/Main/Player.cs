@@ -426,13 +426,13 @@ public class Player : MonoBehaviour
     {
         if (BuffManagement.buffTrigger[0])
         {
-            speed = speedDefault[1];
-            jumpForce = jumpForceDefault[1];
+            //speed = speedDefault[1];
+            //jumpForce = jumpForceDefault[1];
         }
         else 
         {
-            speed = speedDefault[0];
-            jumpForce = jumpForceDefault[0];
+            //speed = speedDefault[0];
+            //jumpForce = jumpForceDefault[0];
         }
     }
     void PlayAnim()
