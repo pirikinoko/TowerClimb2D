@@ -6,6 +6,8 @@ public class Monster : MonoBehaviour
 {
     Player player;
     float Speed = 0.5f, jumpForce = 1.5f;
+    float buffMulti;
+    const int scoreBased = 10;
     public float rightLimit, leftLimit;
     Rigidbody2D rb2D;
     Vector2 characterDirection, MonsterPos, localScale, defaultPos;
@@ -41,10 +43,12 @@ public class Monster : MonoBehaviour
         if (other.gameObject.CompareTag("Wepon"))
         {
 
-            GameSystem.score += 15 * GameSystem.combo / 5;
+            GameSystem.score += scoreCalc();
+            SetFeedBackPos(other.transform.position);
+            ScoreFeedBack.scoreDiff = scoreCalc();
+            TimeScript.elapsedTime += 3.0f;
             GameSystem.combo++;
             SoundEffect.sound3Trigger = true;
-            //BuffManagement.buffTrigger[0] = true;
             Destroy(this.gameObject);
         }
     }
@@ -72,5 +76,24 @@ public class Monster : MonoBehaviour
         gameObject.transform.localScale = characterDirection; 
     }
 
+    float scoreCalc()
+    {
+        float scoreMultiBySpeed = Player.avgSpeedY / 16;
+        if (scoreMultiBySpeed < 1.0f) { scoreMultiBySpeed = 1.0f; }
+        buffMulti = 1.0f;
+        if (BuffManagement.buffTrigger[0])
+        {
+            buffMulti = 3.0f;
+        }
+        return scoreBased * (GameSystem.combo / 5) * (scoreMultiBySpeed) * buffMulti;
+    }
+
+    void SetFeedBackPos(Vector2 collisionPos)
+    {
+        Vector2 posTmp = collisionPos;
+        posTmp.x += 0.2f;
+        posTmp.y += 0.2f;
+        ScoreFeedBack.feedBackPos = posTmp;
+    }
 
 }

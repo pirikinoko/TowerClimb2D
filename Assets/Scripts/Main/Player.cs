@@ -353,7 +353,7 @@ public class Player : MonoBehaviour
             attackDuration = 1.0f;
         }
 
-        if (0.20f < attackDuration && attackDuration < 0.5f)   //攻撃の当たり判定ON
+        if (0.1f < attackDuration && attackDuration < 0.40f)   //攻撃の当たり判定ON
         {
             attackCol.gameObject.SetActive(true);
         }

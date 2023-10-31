@@ -121,9 +121,30 @@ public class GameSystem : MonoBehaviour
             StartCoroutine(SizeEffect(comboText, 150, 220));
             lastCombo = combo;
         }
-
+   
     }
     IEnumerator SizeEffect(Text text, int originalSize, int maxSize)
+    {
+        float speed = 5.0f;
+        text.fontSize = originalSize;
+        int n = 350;
+        while (text.fontSize <= maxSize)
+        {
+            text.fontSize += (int)(n * Time.deltaTime);
+            if (text.fontSize % 2 == 0) { yield return null; }
+        }
+
+        //yield return new WaitForSeconds(0.1f);
+
+        while (text.fontSize >= originalSize)
+        {
+            text.fontSize -= (int)(n * Time.deltaTime);
+            if (text.fontSize % 2 == 0) { yield return null; }
+        }
+        sizeEffectCoroutine = null;
+    }
+
+    IEnumerator SizeEffet2(Text text, int originalSize, int maxSize)
     {
         float speed = 5.0f;
         text.fontSize = originalSize;

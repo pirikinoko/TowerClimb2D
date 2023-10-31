@@ -6,7 +6,7 @@ public class Collision : MonoBehaviour
 {
     int count = 0;
     float buffMulti;
-    const int scoreBased = 5;
+    const int scoreBased = 10;
     // Start is called before the first frame update
     void Start()
     {
@@ -14,8 +14,7 @@ public class Collision : MonoBehaviour
     }
     private void OnCollisionEnter2D(Collision2D other)
     {
-        float scoreMultiBySpeed = Player.avgSpeedY / 16;
-        if(scoreMultiBySpeed < 1.0f) { scoreMultiBySpeed = 1.0f; }
+       
         if (other.gameObject.CompareTag("Player"))
         {
             if (this.gameObject.CompareTag("Wall"))
@@ -25,19 +24,10 @@ public class Collision : MonoBehaviour
                     this.gameObject.GetComponent<Light2D>().intensity = 0;
                     SoundEffect.sound3Trigger = true;
                     GameSystem.combo++;
-                    buffMulti = 1.0f;
-                    if (BuffManagement.buffTrigger[0])
-                    {
-                        buffMulti = 3.0f;
-                    }
-                    GameSystem.score += scoreBased * 3 *( GameSystem.combo / 5) * (scoreMultiBySpeed) * buffMulti;
+                    GameSystem.score += scoreCalc();
                     TimeScript.elapsedTime += 1;
-                    Vector2 posTmp  = other.gameObject.transform.position;
-                    posTmp.x += 0.2f;
-                    posTmp.y += 0.2f;
-                    ScoreFeedBack.feedBackPos = posTmp;
-                    ScoreFeedBack.scoreDiff = scoreBased * 3 * (GameSystem.combo / 5) * (scoreMultiBySpeed) * buffMulti;
-                    Debug.Log( (GameSystem.combo / 5));
+                    SetFeedBackPos(other.transform.position);
+                    ScoreFeedBack.scoreDiff = scoreCalc();
                     count++;
                 }
 
@@ -50,18 +40,10 @@ public class Collision : MonoBehaviour
                     this.gameObject.GetComponent<Light2D>().intensity = 0;
                     SoundEffect.sound3Trigger = true;
                     GameSystem.combo++;
-                    buffMulti = 1.0f;
-                    if (BuffManagement.buffTrigger[0])
-                    {
-                        buffMulti = 3.0f;
-                    }
-                    GameSystem.score += scoreBased * GameSystem.combo / 5 * (scoreMultiBySpeed) * buffMulti;
+                    GameSystem.score += scoreCalc();
                     TimeScript.elapsedTime += 1;
-                    Vector2 posTmp = other.gameObject.transform.position;
-                    posTmp.x += 0.2f;
-                    posTmp.y += 0.2f;
-                    ScoreFeedBack.feedBackPos = posTmp;
-                    ScoreFeedBack.scoreDiff = scoreBased * GameSystem.combo / 5 * (scoreMultiBySpeed) * buffMulti;
+                    SetFeedBackPos(other.transform.position);
+                    ScoreFeedBack.scoreDiff = scoreCalc();
                     count++;
                 }
             }
@@ -96,6 +78,26 @@ public class Collision : MonoBehaviour
             GenerateStage.collisionPos[objNumber] = this.gameObject.transform.position.x;
         }
         
+    }
+
+    float scoreCalc()
+    {
+        float scoreMultiBySpeed = Player.avgSpeedY / 16;
+        if (scoreMultiBySpeed < 1.0f) { scoreMultiBySpeed = 1.0f; }
+        buffMulti = 1.0f;
+        if (BuffManagement.buffTrigger[0])
+        {
+            buffMulti = 3.0f;
+        }
+        return scoreBased  * (GameSystem.combo / 5) * (scoreMultiBySpeed) * buffMulti;
+    }
+
+    void SetFeedBackPos(Vector2 collisionPos)
+    {
+        Vector2 posTmp = collisionPos;
+        posTmp.x += 0.2f;
+        posTmp.y += 0.2f;
+        ScoreFeedBack.feedBackPos = posTmp;
     }
 }
 
