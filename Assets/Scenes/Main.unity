@@ -150,9 +150,10 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -36.055058, y: -6.528208, z: 0}
   m_LocalScale: {x: 0.2, y: 15, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 1216289947}
   m_Father: {fileID: 0}
-  m_RootOrder: 13
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &25631415
 SpriteRenderer:
@@ -13020,7 +13021,7 @@ Transform:
   m_LocalScale: {x: 15, y: 0.2, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 12
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &635929872
 SpriteRenderer:
@@ -13202,7 +13203,7 @@ Transform:
   m_LocalScale: {x: 15, y: 0.2, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &709469293
 SpriteRenderer:
@@ -13319,6 +13320,7 @@ MonoBehaviour:
   sound2: {fileID: 8300000, guid: db98b7dd06c4bc241bbadf520583f04a, type: 3}
   sound3: {fileID: 8300000, guid: 63c0352af2335184fbeca61a937f051d, type: 3}
   sound4: {fileID: 8300000, guid: b1820171525040748a243e1e6dda7993, type: 3}
+  sound5: {fileID: 8300000, guid: 360f5803aa1ca1d4582b0ed711da2765, type: 3}
 --- !u!4 &734923155
 Transform:
   m_ObjectHideFlags: 0
@@ -14190,11 +14192,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1216289945}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -21.055058, y: 0.9717923, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 75, y: 0.5, z: 0}
+  m_LocalScale: {x: 5, y: 0.06666667, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_Father: {fileID: 25631414}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &1216289948
 BoxCollider2D:
@@ -14664,7 +14666,7 @@ Transform:
   m_LocalScale: {x: 0.2, y: 15, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 14
+  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1394215392
 SpriteRenderer:

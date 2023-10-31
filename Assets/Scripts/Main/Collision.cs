@@ -5,6 +5,7 @@ using UnityEngine.Experimental.Rendering.Universal;
 public class Collision : MonoBehaviour
 {
     int count = 0;
+    float buffMulti;
     const int scoreBased = 5;
     // Start is called before the first frame update
     void Start()
@@ -24,7 +25,7 @@ public class Collision : MonoBehaviour
                     this.gameObject.GetComponent<Light2D>().intensity = 0;
                     SoundEffect.sound3Trigger = true;
                     GameSystem.combo++;
-                    float buffMulti = 1.0f;
+                    buffMulti = 1.0f;
                     if (BuffManagement.buffTrigger[0])
                     {
                         buffMulti = 3.0f;
@@ -49,7 +50,7 @@ public class Collision : MonoBehaviour
                     this.gameObject.GetComponent<Light2D>().intensity = 0;
                     SoundEffect.sound3Trigger = true;
                     GameSystem.combo++;
-                    float buffMulti = 1.0f;
+                    buffMulti = 1.0f;
                     if (BuffManagement.buffTrigger[0])
                     {
                         buffMulti = 3.0f;
@@ -71,7 +72,8 @@ public class Collision : MonoBehaviour
                SoundEffect.sound1Trigger = true;
                Debug.Log(other.gameObject.name + "と衝突しました");
                Destroy(this.gameObject);
-            }   
+            }
+            ScoreFeedBack.diffBeforeMulti = ScoreFeedBack.scoreDiff / buffMulti;
         }
         
     }

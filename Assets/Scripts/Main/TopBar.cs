@@ -45,10 +45,39 @@ public class TopBar : MonoBehaviour
                 iconEndPos = GameObject.Find("EndLine").transform.position;
                 if (iconObj[i].transform.position.x < iconEndPos.x)
                 {
-                    Destroy(iconObj[i]);
-                    BuffManagement.buffTrigger[0] = true;
+                  if(i == 0) 
+                    {
+                        Effect1();
+                    }
+                    if (i == 1)
+                    {
+                        Effect2();
+                    }
+                    if (i == 2)
+                    {
+                        Effect3();
+                    }
                 }
             }
         }
+    }
+
+    void Effect1() 
+    {
+        Destroy(iconObj[0]);
+        BuffManagement.buffTrigger[0] = true;
+        SoundEffect.sound5Trigger = true;
+    }
+    void Effect2()
+    {
+        Destroy(iconObj[1]);
+        BuffManagement.buffTrigger[0] = true;
+        SoundEffect.sound5Trigger = true;
+    }
+    void Effect3()
+    {
+        Destroy(iconObj[2]);
+        BuffManagement.buffTrigger[0] = true;
+        SoundEffect.sound5Trigger = true;
     }
 }

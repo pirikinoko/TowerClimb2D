@@ -5,8 +5,8 @@ using UnityEngine;
 public class SoundEffect : MonoBehaviour
 {
     AudioSource audioSource;
-    public AudioClip sound1, sound2, sound3, sound4;
-    public static bool sound1Trigger, sound2Trigger, sound3Trigger, sound4Trigger;
+    public AudioClip sound1, sound2, sound3, sound4, sound5;
+    public static bool sound1Trigger, sound2Trigger, sound3Trigger, sound4Trigger, sound5Trigger;
     // Start is called before the first frame update
     void Start()
     {
@@ -35,6 +35,11 @@ public class SoundEffect : MonoBehaviour
         {
             audioSource.PlayOneShot(sound4);
             sound4Trigger = false;
+        }
+        if (sound5Trigger)
+        {
+            audioSource.PlayOneShot(sound5);
+            sound5Trigger = false;
         }
     }
 
