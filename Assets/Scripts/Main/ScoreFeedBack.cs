@@ -6,29 +6,39 @@ using System;
 
 public class ScoreFeedBack : MonoBehaviour
 {
-    GameObject scoreFeedBackGO, buffMultiTextGO; 
-    Text scoreFeedBackTX, buffMultiTx;
-    float textAlpha = 0, activeTime = 1.0f, scoreDisplay, diffGoal;
+    public Transform parentObject; // 親となるゲームオブジェクト
+    GameObject[] scoreFeedBackGO = new GameObject[10], buffMultiTextGO = new GameObject[10];
+    Text[] scoreFeedBackTX = new Text[10], buffMultiTx = new Text[10];
+    Color[] textColor = new Color[10];
+    float[] textAlpha = new float[10], activeTime = new float[10];
+    bool[] isWorking = new bool[10];
+    int[] coloutineCount = new int[10];
+
+    int SFBNum, BMTNum;
+
+    float  scoreDisplay, diffGoal;
     const float resetActiveTime = 1.0f;
     public static float scoreDiff, diffBeforeMulti;
     public static Vector2 feedBackPos;
-    bool isWorking = false, stopCoroutine = false;
-    Color textColor;
+
     // Start is called before the first frame update
     void Start()
     {
-        scoreFeedBackGO = this.gameObject;
-        scoreFeedBackTX = GetComponent<Text>();
-        buffMultiTextGO = GameObject.Find("BuffMultiText");
-        buffMultiTx = buffMultiTextGO.GetComponent<Text>();
-        textColor = scoreFeedBackTX.color;
+       
         scoreDiff = 0;
         diffBeforeMulti = 0;
         diffGoal = 0;
-        textAlpha = 0;
-        activeTime  = 1.0f;
-        stopCoroutine = true;
-        isWorking = false;
+
+        SFBNum = 0;
+        BMTNum = 0;
+
+        for (int i = 0; i < scoreFeedBackGO.Length; i++)
+        {
+            activeTime[i] = 1.0f;
+            textAlpha[i]= 0;
+            isWorking [i]= false;
+            coloutineCount[i]= 0;
+        }
     }
 
     // Update is called once per frame
@@ -37,88 +47,98 @@ public class ScoreFeedBack : MonoBehaviour
         BuffManagement.buffTrigger[0] = true;
         if (scoreDiff != 0)
         {
-            if (BuffManagement.buffTrigger[0]) 
+            GameObject scoreFeedBackPrefab = (GameObject)Resources.Load("feedBackText");
+            scoreFeedBackGO[SFBNum]  = Instantiate(scoreFeedBackPrefab, feedBackPos, Quaternion.identity, parentObject);
+            scoreFeedBackTX[SFBNum] = scoreFeedBackGO[SFBNum].GetComponent<Text>();
+            textColor[SFBNum] = scoreFeedBackTX[SFBNum].color;
+            if (BuffManagement.buffTrigger[0])
             {
                 scoreDisplay = diffBeforeMulti;
                 diffGoal = scoreDiff;
             }
-            else 
+            else
             {
                 scoreDisplay = scoreDiff;
-                scoreFeedBackTX.text = String.Format("{0:####}", scoreDisplay);
+                scoreFeedBackTX[SFBNum].text = String.Format("{0:####}", scoreDisplay);
                 if (scoreDiff < 0)
                 {
-                    scoreFeedBackTX.text = "-" + String.Format("{0:####}", scoreDisplay);
+                    scoreFeedBackTX[SFBNum].text = "-" + String.Format("{0:####}", scoreDisplay);
                 }
             }
-     
-            scoreFeedBackGO.transform.position = feedBackPos;
-            textAlpha = 1;
-            isWorking = true;
+
+            textAlpha[SFBNum] = 1;
+            isWorking[SFBNum] = true;
+            coloutineCount[SFBNum] = 0;
             scoreDiff = 0;
             diffBeforeMulti = 0;
-            activeTime = resetActiveTime;
-            stopCoroutine = true;
+
+
+
+            SFBNum++;
+            if (SFBNum == 10) { SFBNum = 0; }
         }
 
-        if (isWorking) 
+        for (int i = 0; i < scoreFeedBackGO.Length; i++)
         {
-            textAlpha -= 0.6f * Time.deltaTime;
-            activeTime -= 0.6f * Time.deltaTime;
-            if (scoreDisplay < diffGoal && BuffManagement.buffTrigger[0])
-            { 
-                StartCoroutine(gainScoreDisplay());
+            if (isWorking[i])
+            {
+                textAlpha[i] -= 0.6f * Time.deltaTime;
+                activeTime[i] -= 0.6f * Time.deltaTime;
+                if (scoreDisplay < diffGoal && BuffManagement.buffTrigger[0] && coloutineCount[i] == 0)
+                {
+                    StartCoroutine(gainScoreDisplay(i));
+                    coloutineCount[i] = 1;
+                }
+                textColor[i].a = textAlpha[i];
+                scoreFeedBackTX[i].color = textColor[i];
+
+                if (activeTime[i] < 0)
+                {
+                    isWorking[i] = false;
+                    Destroy(scoreFeedBackGO[i]);
+                    activeTime[i] = resetActiveTime;
+                }
             }
-             
-        }
 
-        if (activeTime < 0)
-        {
-            isWorking=false;
+      
+
         }
-        textColor.a = textAlpha;
-        scoreFeedBackTX.color = textColor;
+     
     }
 
-    IEnumerator gainScoreDisplay() 
+    IEnumerator gainScoreDisplay(int targetSFB) 
     {
-        Vector2 buffMultiPos = scoreFeedBackGO.transform.position;
+        Vector2 buffMultiPos = scoreFeedBackGO[targetSFB].transform.position;
         float buffMulti = 3.0f;
         buffMultiPos.x += 0.2f;
         buffMultiPos.y += 0.2f;
-        buffMultiTextGO.gameObject.SetActive(true);
-        buffMultiTextGO.transform.position = buffMultiPos;
+        GameObject buffMultiPrefab = (GameObject)Resources.Load("BuffMultiText");
+        buffMultiTextGO[targetSFB] = Instantiate(buffMultiPrefab, buffMultiPos, Quaternion.identity, parentObject);
+        buffMultiTx[targetSFB] = buffMultiTextGO[targetSFB].GetComponent<Text>();
 
-        scoreFeedBackTX.text = String.Format("{0:####}", scoreDisplay);
-        buffMultiTx.text = String.Format("x" + "{0:####}", buffMulti);
+        scoreFeedBackTX[targetSFB].text = String.Format("{0:####}", scoreDisplay);
+        buffMultiTx[targetSFB].text = String.Format("x" + "{0:####}", buffMulti);
         if (diffGoal < 0)
         {
-            scoreFeedBackTX.text = "-" + String.Format("{0:####}", scoreDisplay);
-            buffMultiTx.text = String.Format("x" + "{0:####}", buffMulti);
+            scoreFeedBackTX[targetSFB].text = "-" + String.Format("{0:####}", scoreDisplay);
+            buffMultiTx[targetSFB].text = String.Format("x" + "{0:####}", buffMulti);
         }
 
-        
-        for (int i = 0; i < 50; i++)
-        {      
-            if (stopCoroutine) { Debug.Log("Working"); buffMultiTextGO.gameObject.SetActive(false); stopCoroutine = false; yield break; }
-            yield return new WaitForSeconds(0.008f);
-        }
-      
+        yield return new WaitForSeconds(0.5f);
+        Destroy(buffMultiTextGO[targetSFB]);
+
 
         while (scoreDisplay < diffGoal)
         {
-            if (stopCoroutine) { buffMultiTextGO.gameObject.SetActive(false); stopCoroutine = false; yield break; }
             scoreDisplay += diffGoal   / 200;
-            scoreFeedBackTX.text = String.Format("{0:####}", scoreDisplay);
-            buffMultiTx.text = String.Format("x" +  buffMulti);
+            scoreFeedBackTX[targetSFB].text = String.Format("{0:####}", scoreDisplay);
+            buffMultiTx[targetSFB].text = String.Format("x" +  buffMulti);
             if (diffGoal < 0)
             {
-                scoreFeedBackTX.text = "-" + String.Format("{0:####}", scoreDisplay);
-                buffMultiTx.text = String.Format("x" + "{0:####}", buffMulti);
+                scoreFeedBackTX[targetSFB].text = "-" + String.Format("{0:####}", scoreDisplay);
+                buffMultiTx[targetSFB].text = String.Format("x" + "{0:####}", buffMulti);
             }
             yield return new WaitForSeconds(0.05f * Time.deltaTime);
-
         }
-        buffMultiTextGO.gameObject.SetActive(false);
     }
 }
