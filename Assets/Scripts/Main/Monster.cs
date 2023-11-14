@@ -35,7 +35,7 @@ public class Monster : MonoBehaviour
         if(rnd == 0){ Jump();}
         Vector2 nowvelocity = rb2D.velocity;
         this.transform.position = MonsterPos;
-        rb2D.velocity = nowvelocity;
+        //rb2D.velocity = nowvelocity;
     }
 
     void OnTriggerEnter2D(Collider2D other)

@@ -17,7 +17,7 @@ public class TimeScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        loadAnimGO.SetActive(true);
+        //loadAnimGO.SetActive(true);
         playTime = setTime;
         elapsedTime = setTime;
         pastTime = 0;

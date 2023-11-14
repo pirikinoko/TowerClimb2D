@@ -17,7 +17,7 @@ public class Player : MonoBehaviour
     BoxCollider2D legCol2d, col2d;
     public static Vector2 characterDirection;
     public Tilemap tilemap;
-    public Text DebugText, avgSpeedYText;
+    public Text DebugText;
     public static float avgSpeedY;
     public Vector2 defaultPos;
     public float speed, jumpForce;
@@ -47,7 +47,6 @@ public class Player : MonoBehaviour
         Transform myTransform = this.transform;
         latestPos = player.transform.position;
         this.transform.position = defaultPos;
-        avgSpeedYText.text = "";
         for (int i = 0; i < playerSpeedYRecord.Length; i++)
         {
             playerSpeedYRecord[i] = nullNumber;
@@ -153,52 +152,52 @@ public class Player : MonoBehaviour
         playerPos = this.transform.position;
         playerSpeed = ((playerPos - latestPos) / Time.deltaTime);
         latestPos = playerPos;
-        //平均速度
-        if ((int)TimeScript.pastTime > lastTIme) //１秒ごとの速度を配列に記録していく（最大10個）
-        {
-            playerSpeedYRecord[calcCount] = playerSpeed.y;
-            lastTIme++;
-            calcCount++;
-            if (calcCount == playerSpeedYRecord.Length) { calcCount = 0; }
-        }
-        //直近30秒間で進んだ距離を計算
-        speedYGoal = 0;
-        for (int i = 0; i < playerSpeedYRecord.Length; i++)
-        {
-            if (playerSpeedYRecord[i] != nullNumber)
-            {
-                speedYGoal += playerSpeedYRecord[i];
-            }
-        }
-        if (speedYGoal == 0 || (int)TimeScript.pastTime < 10)
-        {
-            avgSpeedYText.text = "";
-            return;
-        }
-        if ((int)TimeScript.pastTime < 30)
-        {
-            speedYGoal *= 90 / (int)TimeScript.pastTime;
-        }
-        else
-        {
-            speedYGoal *= 3;
-        }
-        //流動的に数値を表示
-        if (avgSpeedY < speedYGoal)
-        {
-            avgSpeedY += speedYGoal * Time.deltaTime;
-        }
-        else if (avgSpeedY > speedYGoal)
-        {
-            avgSpeedY -= speedYGoal * Time.deltaTime;
-        }
-        //0.1秒ごとにテキスト更新 
-        updateTextPeriod -= Time.deltaTime;
-        if (updateTextPeriod < 0)
-        {
-            avgSpeedYText.text = String.Format("{0:##.#}", avgSpeedY) + "m/90s";
-            updateTextPeriod = 0.1f;
-        }
+        ////平均速度
+        //if ((int)TimeScript.pastTime > lastTIme) //１秒ごとの速度を配列に記録していく（最大10個）
+        //{
+        //    playerSpeedYRecord[calcCount] = playerSpeed.y;
+        //    lastTIme++;
+        //    calcCount++;
+        //    if (calcCount == playerSpeedYRecord.Length) { calcCount = 0; }
+        //}
+        ////直近30秒間で進んだ距離を計算
+        //speedYGoal = 0;
+        //for (int i = 0; i < playerSpeedYRecord.Length; i++)
+        //{
+        //    if (playerSpeedYRecord[i] != nullNumber)
+        //    {
+        //        speedYGoal += playerSpeedYRecord[i];
+        //    }
+        //}
+        //if (speedYGoal == 0 || (int)TimeScript.pastTime < 10)
+        //{
+        //    avgSpeedYText.text = "";
+        //    return;
+        //}
+        //if ((int)TimeScript.pastTime < 30)
+        //{
+        //    speedYGoal *= 90 / (int)TimeScript.pastTime;
+        //}
+        //else
+        //{
+        //    speedYGoal *= 3;
+        //}
+        ////流動的に数値を表示
+        //if (avgSpeedY < speedYGoal)
+        //{
+        //    avgSpeedY += speedYGoal * Time.deltaTime;
+        //}
+        //else if (avgSpeedY > speedYGoal)
+        //{
+        //    avgSpeedY -= speedYGoal * Time.deltaTime;
+        //}
+        ////0.1秒ごとにテキスト更新 
+        //updateTextPeriod -= Time.deltaTime;
+        //if (updateTextPeriod < 0)
+        //{
+        //    avgSpeedYText.text = String.Format("{0:##.#}", avgSpeedY) + "m/90s";
+        //    updateTextPeriod = 0.1f;
+        //}
 
 
 

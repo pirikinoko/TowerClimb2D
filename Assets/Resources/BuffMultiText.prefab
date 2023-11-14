@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3057897729590491600}
   - component: {fileID: 3057897729590491181}
   - component: {fileID: 3057897729590491602}
+  - component: {fileID: -5369920178327783296}
   m_Layer: 5
   m_Name: BuffMultiText
   m_TagString: Untagged
@@ -79,3 +80,17 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: 
+--- !u!114 &-5369920178327783296
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3057897729590491601}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ebe30dad00bb42689ee70291f6a62bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scoreDisplay: 0
+  diffGoal: 0

@@ -39,8 +39,8 @@ public class GameSystem : MonoBehaviour
         ScoreDisplay();
         GameOver();
         Effect();
-        scoreText.text = String.Format("{0:####}", scoreDisplay);
-        comboText.text = String.Format("{0:####}", combo);
+        scoreText.text = "Score:" + String.Format("{0:####}", scoreDisplay);
+        comboText.text = "x" + String.Format("{0:####}", combo);
     }
     void FixedUpdate()
     {

@@ -1,6 +1,7 @@
  using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Tilemaps;
 public class GenerateStage : MonoBehaviour
 {
@@ -8,6 +9,7 @@ public class GenerateStage : MonoBehaviour
     [SerializeField] Tile backBrick, sideWall;
     [SerializeField] GameObject player, checkLine;
     [SerializeField] GameObject[] frames;
+    [SerializeField] Text heightText;
     GameObject[] obj = new GameObject[objUnit];
     GameObject[] enemy = new GameObject[5];
     GameObject[] objForCheckLength;
@@ -21,7 +23,7 @@ public class GenerateStage : MonoBehaviour
     Vector2 checkLinePos;
     public float deadLine { get; set; }
     int[] objectType = new int[objUnit];
-    int currentObj = 0, prev, prev2, count = 0, target = 0, tileY, objLength, objDirection = 0, enemyCount = 0, startCount, deleteDuration = 5;
+    int currentObj = 0, prev, prev2, count = 0, target = 0, tileY, objLength, objDirection = 0, enemyCount = 0, startCount, deleteDuration = 5, startHeight, currentHeight;
     public static float[] collisionPos = new float[30];
     // Start is called before the first frame update
     void Start()
@@ -73,6 +75,7 @@ public class GenerateStage : MonoBehaviour
         }
         
         playerYPrev = player.transform.position.y;
+        startHeight = (int)player.transform.position.y;
         tileY = 0;
         currentObj = 0;
         objectType[0] = 0;
@@ -91,8 +94,12 @@ public class GenerateStage : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        currentHeight = (int)player.transform.position.y;
+        heightText.text = (currentHeight - startHeight).ToString() + "M";
+
         //長さを計測
-        if(TimeScript.startTime > 0)
+        if (TimeScript.startTime > 0)
         {
             checkLinePos.x -= 1.0f * Time.deltaTime;
             checkLine.transform.position = checkLinePos;
@@ -127,6 +134,8 @@ public class GenerateStage : MonoBehaviour
                 {
                     maxLength = 4;
                 }
+           
+                difficulty = currentHeight - startHeight;
                 float rndTmp = Random.Range(0, ((100 / maxLength)  + difficulty) * maxLength);
                 float[] provbability = new float[maxLength];
                 for (int i = 0; i < maxLength; i++)
