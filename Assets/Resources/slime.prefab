@@ -99,8 +99,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19137aac608d1674b8cf49a6e7d2a985, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rightLimit: 0.4
-  leftLimit: 0.4
 --- !u!50 &-8299122259163461188
 Rigidbody2D:
   serializedVersion: 4

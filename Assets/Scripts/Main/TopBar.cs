@@ -7,10 +7,11 @@ public class TopBar : MonoBehaviour
     const int Iconval = 3;
     GameObject[] iconObj = new GameObject[Iconval];
     Vector2 iconStartPos, iconEndPos;
-    const float generateDuration = 15, maxEnemy = 20;
+    const float generateDuration = 15, maxEnemy = 10;
     float generateTimer, speed = 0.05f;
     string[] icons = { "BuffIcon", "SlimeIcon", "Pixel3" };
     int objCount = 0;
+    int[] eventType = new int[10];
     // Start is called before the first frame update
     void Start()
     {
@@ -29,6 +30,7 @@ public class TopBar : MonoBehaviour
             GameObject iconPrefab = (GameObject)Resources.Load(icons[rnd]);
             iconObj[objCount] = (GameObject)Instantiate(iconPrefab, parentObject.transform);
             iconObj[objCount].transform.position = GameObject.Find("StartLine").transform.position;
+            eventType[objCount] = rnd;
             objCount++;
             if (objCount == iconObj.Length)
             {
@@ -46,46 +48,46 @@ public class TopBar : MonoBehaviour
                 iconEndPos = GameObject.Find("EndLine").transform.position;
                 if (iconObj[i].transform.position.x < iconEndPos.x)
                 {
-                  if(i == 0) 
+                  if(eventType[i] == 0) 
                     {
-                        Effect1();
+                        Effect1(i);
                     }
-                    if (i == 1)
+                    if (eventType[i] == 1)
                     {
-                        Effect2();
+                        Effect2(i);
                     }
-                    if (i == 2)
+                    if (eventType[i] == 2)
                     {
-                        Effect3();
+                        Effect3(i);
                     }
                 }
             }
         }
     }
 
-    void Effect1() 
+    void Effect1(int toDestroy) 
     {
-        Destroy(iconObj[0]);
+        Destroy(iconObj[toDestroy]);
         BuffManagement.buffTrigger[0] = true;
         SoundEffect.sound5Trigger = true;
     }
-    void Effect2()
+    void Effect2(int toDestroy)
     {
-        Destroy(iconObj[1]);
+        Destroy(iconObj[toDestroy]);
         StartCoroutine(GenerateSlimes());
       
         SoundEffect.sound5Trigger = true;
     }
-    void Effect3()
+    void Effect3(int toDestroy)
     {
-        Destroy(iconObj[2]);
+        Destroy(iconObj[toDestroy]);
         SoundEffect.sound5Trigger = true;
     }
 
     IEnumerator GenerateSlimes()
     {
-        GameObject[] enemies = new GameObject[20];
-        GameObject enemyObj = (GameObject)Resources.Load("slime2");
+        GameObject[] enemies = new GameObject[10];
+        GameObject enemyObj = (GameObject)Resources.Load("slime");
         for (int i = 0; i < maxEnemy; i++)
         {
             Vector2 generatePos = GameObject.Find("Player").transform.position;

@@ -16,7 +16,7 @@ public class GenerateStage : MonoBehaviour
     const int Floor = 0, Wall = 1, Right = 0, Left = 1, objUnit = 30, nullNumber = 99999;
     const float rightLimit = 1.8f, leftLimit = -2.1f;
     string [,] objNames = { { "Floor1", "Floor2", "Floor3", "Floor4" }, { "Wall1", "Wall2", "Wall3" , "Wall4"} };
-    float  [,] eachLength = new float[2,4];
+    public float  [,] eachLength = new float[2,4];
     float xMax = 0, xMin = 0, yMax = 0, yMin = 0, playerYPrev, sizeX, sizeY, posX = -10, posY = 0, difficulty = 30;
     bool[] objActive = new bool[objUnit];
     Vector3[] objPos = new Vector3[objUnit];
@@ -175,7 +175,7 @@ public class GenerateStage : MonoBehaviour
         {
             Vector3 enemyPos = objPos[targetNum];
             Vector3 candlePos = enemyPos;
-            enemyPos.y += 0.005f;
+            enemyPos.y += 0.1f;
             candlePos.y += 0.5f;
             GameObject enemyObj = (GameObject)Resources.Load("slime");
             GameObject candleObj = (GameObject)Resources.Load("Candle");
