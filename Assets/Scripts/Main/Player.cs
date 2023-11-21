@@ -22,7 +22,7 @@ public class Player : MonoBehaviour
     public Vector2 defaultPos;
     public float speed, jumpForce;
     float Gravity = 3500, elapsedTime, wallJumpTime, attackSign, attackDuration = 1.0f, slideDuration, speedYGoal, lastTIme, updateTextPeriod;
-   
+
     Vector3 latestPos, playerPos;
     Vector2 playerSpeed, defaultSize;
     float[] playerSpeedYRecord = new float[30];
@@ -59,6 +59,7 @@ public class Player : MonoBehaviour
 
     void Update()
     {
+
         //重力付与
         rbody2D.AddForce(transform.up * -Gravity * Time.deltaTime);
         Vector3 legPos = playerPos; legPos.y -= 0.12f;
@@ -76,7 +77,7 @@ public class Player : MonoBehaviour
             Ctrl();
             PlayerSpeed();
             PlayAnim();
-            PhysicalBuff();
+            //PhysicalBuff();
             Attack();
         }
     }
@@ -85,7 +86,16 @@ public class Player : MonoBehaviour
     //接触時処理
     private void OnCollisionEnter2D(Collision2D other)
     {
-        if (other.gameObject.CompareTag("Wall"))
+        float distance = 0.2f;
+        int layer = 1 << LayerMask.NameToLayer("Default");
+        Vector2 rayOrigin = player.transform.position;
+        rayOrigin.y -= 0.2f;
+        // Ray の方向（下向き）
+        Vector2 rayDirection = Vector2.down;
+
+        // Raycast の結果を格納する RaycastHit2D 変数
+        RaycastHit2D hit = Physics2D.Raycast(rayOrigin, rayDirection, distance, layer);
+        if (hit.collider == null)
         {
             if (!onGround)
             {
@@ -100,32 +110,32 @@ public class Player : MonoBehaviour
                 lastNum = i;
             }
         }
-
     }
 
-    //床に触れている間ジャンプカウントリセット
     private void OnCollisionStay2D(Collision2D other)
     {
-        float distance = 0.1f;
-        int layerMask = 1 << LayerMask.NameToLayer("Default");
-        RaycastHit2D hit = Physics2D.Raycast(player.transform.position, Vector2.down, distance, layerMask);
-        if (hit.collider == null )
+        float distance = 0.2f;
+        int layer = 1 << LayerMask.NameToLayer("Default");
+        Vector2 rayOrigin = player.transform.position;
+        rayOrigin.y -= 0.2f;
+        // Ray の方向（下向き）
+        Vector2 rayDirection = Vector2.down;
+
+        // Raycast の結果を格納する RaycastHit2D 変数
+        RaycastHit2D hit = Physics2D.Raycast(rayOrigin, rayDirection, distance, layer);
+        if (hit.collider == null)
         {
-                string colname = other.gameObject.name;
-                animeState = "OnWall";
-                //最後にぶつかった壁の名前が当たった壁と違うとき壁ジャンプリセット
-                if (other.gameObject.name != wallName) { jumpCount = 1; }
-                if (other.gameObject.name != "None")
-                {
-                    wallName = other.gameObject.name;
-                }
-
-                if (playerSpeed.y == 0)
-                {
-
-                }
+            //Debug.Log("HitCollider == null");
+            string colname = other.gameObject.name;
+            animeState = "OnWall";
+            //最後にぶつかった壁の名前が当たった壁と違うとき壁ジャンプリセット
+            if (other.gameObject.name != wallName) { jumpCount = 1; }
+            if (other.gameObject.name != "None")
+            {
+                wallName = other.gameObject.name;
+            }
         }
-        else 
+        else
         {
             if (legOnGround)
             {
@@ -150,9 +160,10 @@ public class Player : MonoBehaviour
         if (other.gameObject.CompareTag("Wall"))
         {
             wallflag = true;
-            onWall = false;
-            animeState = "jumpUp";
+           
         }
+        onWall = false;
+        animeState = "jumpUp";
     }
 
     void PlayerSpeed()
@@ -437,7 +448,7 @@ public class Player : MonoBehaviour
             //speed = speedDefault[1];
             //jumpForce = jumpForceDefault[1];
         }
-        else 
+        else
         {
             //speed = speedDefault[0];
             //jumpForce = jumpForceDefault[0];

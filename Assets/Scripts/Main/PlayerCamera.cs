@@ -15,7 +15,7 @@ public class PlayerCamera : MonoBehaviour
     void Update()
     {
         Vector3 playerPos = player.transform.position;
-        if(playerPos.y > generateStage.deadLine + 3) 
+        if(playerPos.y > generateStage.deadLine + 2) 
         {
             //カメラとプレイヤーの位置を同じにする(追従)
             transform.position = new Vector3(playerPos.x, playerPos.y, -10);

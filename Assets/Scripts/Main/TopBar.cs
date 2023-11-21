@@ -91,7 +91,7 @@ public class TopBar : MonoBehaviour
         for (int i = 0; i < maxEnemy; i++)
         {
             Vector2 generatePos = GameObject.Find("Player").transform.position;
-            generatePos.y += 5;
+            generatePos.y += 3;
             enemies[i] = Instantiate(enemyObj, generatePos, Quaternion.identity);
             int rnd1 = Random.Range(-2, 2);
             int rnd2 = Random.Range(-2, 2);

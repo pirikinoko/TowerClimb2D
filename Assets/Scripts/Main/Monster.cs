@@ -45,7 +45,7 @@ public class Monster : MonoBehaviour
         if(jumpCD < 0)
         {
             Jump();
-            jumpCD = Random.Range(0, 50);
+            jumpCD = Random.Range(10, 50);
         }
         Vector2 nowvelocity = rb2D.velocity;
         this.transform.position = MonsterPos;
