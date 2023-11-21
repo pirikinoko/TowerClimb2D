@@ -106,18 +106,26 @@ public class Player : MonoBehaviour
     //床に触れている間ジャンプカウントリセット
     private void OnCollisionStay2D(Collision2D other)
     {
-        if (other.gameObject.CompareTag("Wall"))
+        float distance = 0.1f;
+        int layerMask = 1 << LayerMask.NameToLayer("Default");
+        RaycastHit2D hit = Physics2D.Raycast(player.transform.position, Vector2.down, distance, layerMask);
+        if (hit.collider == null )
         {
-            string colname = other.gameObject.name;
-            animeState = "OnWall";
-            //最後にぶつかった壁の名前が当たった壁と違うとき壁ジャンプリセット
-            if (other.gameObject.name != wallName) { jumpCount = 1; }
-            if (other.gameObject.name != "None")
-            {
-                wallName = other.gameObject.name;
-            }
+                string colname = other.gameObject.name;
+                animeState = "OnWall";
+                //最後にぶつかった壁の名前が当たった壁と違うとき壁ジャンプリセット
+                if (other.gameObject.name != wallName) { jumpCount = 1; }
+                if (other.gameObject.name != "None")
+                {
+                    wallName = other.gameObject.name;
+                }
+
+                if (playerSpeed.y == 0)
+                {
+
+                }
         }
-        if (other.gameObject.CompareTag("Surface"))
+        else 
         {
             if (legOnGround)
             {
@@ -128,6 +136,7 @@ public class Player : MonoBehaviour
                 onGround = true;
             }
         }
+
     }
     private void OnCollisionExit2D(Collision2D other)
     {

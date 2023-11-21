@@ -83,7 +83,7 @@ public class GenerateStage : MonoBehaviour
         count = 0;
         target = 0;
         enemyCount = 0;
-        deadLine = -10;
+        deadLine = -7;
         difficulty = 0;
         for (int i = 0; i < 20; i++)
         {
@@ -290,7 +290,7 @@ public class GenerateStage : MonoBehaviour
         if (playerPos.y > 2.5f && playerPos.y - objPos[target].y > 4 && obj[target] != null)
         {
             deadLine = objPos[target].y;
-            deadLine -= 3;
+            deadLine -= 2;
             Destroy(obj[target]);
             objActive[target] = false;
             target++;

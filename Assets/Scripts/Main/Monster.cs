@@ -5,12 +5,12 @@ using System.Text.RegularExpressions;
 public class Monster : MonoBehaviour
 {
     Player player;
-    float Speed = 0.5f, jumpForce = 1.5f, jumpCD;
+    float speed = 0.5f, jumpForce = 1.5f, jumpCD;
     float buffMulti;
     const int scoreBased = 10;
     float rightLimit, leftLimit , posGap;
     Rigidbody2D rb2D;
-    Vector2 characterDirection, MonsterPos, localScale, defaultPos;
+    Vector2 characterDirection, MonsterPos, localScale, defaultPos, latestPos, monsterVector;
     string colFloorName, saveFloorName;
     int colFloorLength = 0;
     bool onSurface = false;
@@ -23,6 +23,8 @@ public class Monster : MonoBehaviour
         MonsterPos = this.transform.position;
         Vector2 characterDirection = new Vector2(0.01f, 0.01f);
         jumpCD = Random.Range(0, 50);
+        leftLimit = 1;
+        rightLimit = 1;
         rb2D = this.GetComponent<Rigidbody2D>();
         player = GameObject.Find("Player").GetComponent<Player>();
         generateStage = GameObject.Find("GameSystem").GetComponent<GenerateStage>();
@@ -31,8 +33,10 @@ public class Monster : MonoBehaviour
     // Update is called once per dadaDadad
     void Update()
     {
+    
+
         MonsterPos = this.transform.position;
-        MonsterPos.x += Speed * Time.deltaTime;
+        MonsterPos.x += speed * Time.deltaTime;
         if (MonsterPos.x >= defaultPos.x + rightLimit || MonsterPos.x < defaultPos.x - leftLimit)
         {
             Turn();
@@ -45,7 +49,17 @@ public class Monster : MonoBehaviour
         }
         Vector2 nowvelocity = rb2D.velocity;
         this.transform.position = MonsterPos;
+        Disapper();
         //rb2D.velocity = nowvelocity;
+
+        //速度
+        monsterVector = ((MonsterPos - latestPos) / Time.deltaTime);
+        latestPos = MonsterPos;
+
+        if (monsterVector.y < -3.5f)
+        {
+            rb2D.velocity = new Vector2(0, -3.5f);
+        }
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -65,20 +79,21 @@ public class Monster : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D other) 
     {
-        if(saveFloorName != other.gameObject.name) 
+        if(other.gameObject.name == "Player") 
         {
-                saveFloorName = other.gameObject.name;
-               posGap = this.transform.position.x - other.transform.position.x;
-        }
-        if (other.gameObject.CompareTag("Enemy")) 
-        {
-            int rnd1 = Random.Range(-2, 2);
-            int rnd2 = Random.Range(-2, 2);
+            int rnd1 = Random.Range(-1, 1);
+            int rnd2 = Random.Range(-1, 1);
             other.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(rnd1, rnd2);
         }
     }
     void OnCollisionStay2D(Collision2D other)
     {
+        if (other.gameObject.name.Contains("Floor") && (saveFloorName != other.gameObject.name))
+        {
+            defaultPos = this.transform.position;
+            saveFloorName = other.gameObject.name;
+            posGap = this.transform.position.x - other.transform.position.x;
+        }
         if (other.gameObject.name.Contains("Floor")) 
         {
             onSurface = true;
@@ -88,10 +103,28 @@ public class Monster : MonoBehaviour
 
             leftLimit = (generateStage.eachLength[0, colFloorLength - 1] / 2) + posGap;
             rightLimit = (generateStage.eachLength[0, colFloorLength - 1] / 2) - posGap;
-            leftLimit *= 0.9f;
-            rightLimit *= 0.9f;
+            leftLimit = Mathf.Clamp(leftLimit, 0, generateStage.eachLength[0, colFloorLength - 1]);
+            rightLimit = Mathf.Clamp(rightLimit, 0, generateStage.eachLength[0, colFloorLength - 1]);
+            leftLimit *= 0.95f;
+            rightLimit *= 0.95f;    
         }
-       
+        else 
+        {
+            leftLimit = 1.5f;
+            rightLimit = 1.5f;
+        }
+
+        if (other.gameObject.CompareTag("Enemy"))
+        {
+            int rnd1 = Random.Range(-3, 3);
+            int rnd2 = Random.Range(-3, 3);
+            other.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(rnd1, rnd2);
+        }
+
+        if (other.gameObject.name == "Surface") 
+        {
+            Destroy(this.gameObject);
+        }
     }
 
     void Jump()//ジャンプ
@@ -105,11 +138,10 @@ public class Monster : MonoBehaviour
     }
     void Turn()
     {      
-        Speed *= -1;
-        MonsterPos.x += Speed * Time.deltaTime;
+        speed *= -1;
         Vector2  characterDirection = gameObject.transform.localScale;
         characterDirection.x *= -1;
-        gameObject.transform.localScale = characterDirection; 
+        gameObject.transform.localScale = characterDirection;
     }
 
     float scoreCalc()
@@ -132,4 +164,14 @@ public class Monster : MonoBehaviour
         ScoreFeedBack.feedBackPos = posTmp;
     }
 
+
+    void Disapper() 
+    {
+        GameObject player = GameObject.Find("Player");
+        Vector2 playerPos = player.transform.position;
+        if (playerPos.y - MonsterPos.y > 6) 
+        {
+            Destroy(this.gameObject);
+        }
+    }
 }

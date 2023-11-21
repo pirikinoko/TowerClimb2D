@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TopBar : MonoBehaviour
 {
-    const int Iconval = 3;
+    const int Iconval = 2;
     GameObject[] iconObj = new GameObject[Iconval];
     Vector2 iconStartPos, iconEndPos;
     const float generateDuration = 15, maxEnemy = 10;
