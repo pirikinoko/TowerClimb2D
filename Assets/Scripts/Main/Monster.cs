@@ -81,7 +81,7 @@ public class Monster : MonoBehaviour
     {
         if(other.gameObject.name == "Player") 
         {
-            int rnd1 = Random.Range(-1, 1);
+            int rnd1 = Random.Range(0, 0);
             int rnd2 = Random.Range(-1, 1);
             other.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(rnd1, rnd2);
         }

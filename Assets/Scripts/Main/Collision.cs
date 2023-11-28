@@ -82,14 +82,13 @@ public class Collision : MonoBehaviour
 
     float scoreCalc()
     {
-        float scoreMultiBySpeed = Player.avgSpeedY / 16;
-        if (scoreMultiBySpeed < 1.0f) { scoreMultiBySpeed = 1.0f; }
+        float heightBonus = 1 + (GenerateStage.playerHeight / 30);
         buffMulti = 1.0f;
         if (BuffManagement.buffTrigger[0])
         {
             buffMulti = 3.0f;
         }
-        return scoreBased  * (GameSystem.combo / 5) * (scoreMultiBySpeed) * buffMulti;
+        return scoreBased  * (GameSystem.combo / 5) * (heightBonus) * buffMulti;
     }
 
     void SetFeedBackPos(Vector2 collisionPos)

@@ -22,6 +22,7 @@ public class GenerateStage : MonoBehaviour
     Vector3[] objPos = new Vector3[objUnit];
     Vector2 checkLinePos;
     public float deadLine { get; set; }
+    public static int playerHeight;
     int[] objectType = new int[objUnit];
     int currentObj = 0, prev, prev2, count = 0, target = 0, tileY, objLength, objDirection = 0, enemyCount = 0, startCount, deleteDuration = 5, startHeight, currentHeight;
     public static float[] collisionPos = new float[30];
@@ -96,6 +97,7 @@ public class GenerateStage : MonoBehaviour
     {
 
         currentHeight = (int)player.transform.position.y;
+        playerHeight = currentHeight - startHeight;
         heightText.text = (currentHeight - startHeight).ToString() + "M";
 
         //長さを計測
@@ -135,12 +137,12 @@ public class GenerateStage : MonoBehaviour
                     maxLength = 4;
                 }
            
-                difficulty = currentHeight - startHeight;
-                float rndTmp = Random.Range(0, ((100 / maxLength)  + difficulty) * maxLength);
+                difficulty = 1 + (playerHeight / 100);
+                float rndTmp = Random.Range(0, ( (100 / maxLength)  + (difficulty * (maxLength * maxLength) ) ) ) ;
                 float[] provbability = new float[maxLength];
                 for (int i = 0; i < maxLength; i++)
                 {
-                    provbability[i] = (100 / maxLength * (i + 1)) + difficulty * (i + 1);
+                    provbability[i] = ((100 / maxLength ) + difficulty * ((i + 1) * (i + 1)));
                     if (rndTmp < provbability[i]) 
                     {
                         objLength = maxLength - i;
@@ -166,12 +168,15 @@ public class GenerateStage : MonoBehaviour
     }
     void GenerateObjects(int targetNum)
     {
+
+        GameObject parentObject = GameObject.Find("GeneratedObjects");
+        Transform parentTransform = parentObject.transform;// ここに親オブジェクトのTransformを指定;
         GameObject prefabObj = (GameObject)Resources.Load(objNames[objectType[targetNum], objLength - 1]);
         obj[targetNum] = Instantiate(prefabObj, objPos[targetNum], Quaternion.identity);
         string[] objDirectionName = {"Right", "Left"};
-        obj[targetNum].name = objNames[objectType[targetNum] , objLength - 1]  + objDirectionName[objDirection] + "-" + targetNum.ToString(); 
-
-        if(objectType[targetNum] == Floor && objLength == 4)
+        obj[targetNum].name = objNames[objectType[targetNum] , objLength - 1]  + objDirectionName[objDirection] + "-" + targetNum.ToString();
+        obj[targetNum].transform.SetParent(parentTransform);
+        if (objectType[targetNum] == Floor && objLength == 4)
         {
             Vector3 enemyPos = objPos[targetNum];
             Vector3 candlePos = enemyPos;
@@ -180,12 +185,16 @@ public class GenerateStage : MonoBehaviour
             GameObject enemyObj = (GameObject)Resources.Load("slime");
             GameObject candleObj = (GameObject)Resources.Load("Candle");
             enemy[enemyCount] = Instantiate(enemyObj, enemyPos, Quaternion.identity);
-            Instantiate(candleObj, candlePos, Quaternion.identity);
+            GameObject candle = Instantiate(candleObj, candlePos, Quaternion.identity);
+
+            enemy[enemyCount].transform.SetParent(parentTransform);
+            candle.transform.SetParent(parentTransform);
             enemyCount++;
             if(enemyCount == 5) 
             {
                 enemyCount = 0;
             }
+
         }
     }
     void SetObjectPos(int targetNum)
