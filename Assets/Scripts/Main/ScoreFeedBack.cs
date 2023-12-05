@@ -10,7 +10,7 @@ public class ScoreFeedBack : MonoBehaviour
     GameObject[] scoreFeedBackGO = new GameObject[10], buffMultiTextGO = new GameObject[10];
     Text[] scoreFeedBackTX = new Text[10], buffMultiTx = new Text[10];
     Color[] textColor = new Color[10];
-    float[] textAlpha = new float[10], activeTime = new float[10];
+    float[] textAlpha = new float[10], activeTime = new float[10], spownTime = new float[10];
     bool[] isWorking = new bool[10];
     int[] coloutineCount = new int[10];
 
@@ -50,7 +50,8 @@ public class ScoreFeedBack : MonoBehaviour
             scoreFeedBackGO[SFBNum]  = Instantiate(scoreFeedBackPrefab, feedBackPos, Quaternion.identity, parentObject);
             scoreFeedBackTX[SFBNum] = scoreFeedBackGO[SFBNum].GetComponent<Text>();
             scoreFeedBackGO[SFBNum].name = "FeedBackText" + SFBNum;
-            if (BuffManagement.buffTrigger[0])
+            spownTime[SFBNum] = TimeScript.pastTime;
+            if (BuffManagement.buffTrigger[0] && spownTime[SFBNum] > BuffManagement.buffStart[0])
             {
                 scoreFeedBackGO[SFBNum].AddComponent<GainScoresAnime>();
                 scoreFeedBackGO[SFBNum].GetComponent<GainScoresAnime>();

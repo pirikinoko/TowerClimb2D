@@ -11,12 +11,12 @@ public class BuffManagement : MonoBehaviour
     public Sprite[] buffIcon;
 
     public static bool[] buffTrigger = new bool[max];
+    public static float[] buffStart = new float[max];
     int[] callTime = new int[max]; 
     float[] buffTime = new float[max];
     float[] imageAlpha = new float[max];
     Color[] imageColor = new Color[max];
     float[] setTime = { 10.0f , 10.0f};
-
     int activeBuffNumber = 0;
     // Start is called before the first frame update
     void Start()
@@ -41,12 +41,13 @@ public class BuffManagement : MonoBehaviour
             if (buffTrigger[i]) 
             {
                 buffTime[i] -= Time.deltaTime;
-
+               
                 if (callTime[i] == 0)
                 {
                     targetImage[activeBuffNumber].GetComponent<Image>().sprite = buffIcon[i];
                     callTime[i] = 1;
                     imageAlpha[activeBuffNumber] = 1.0f;
+                    buffStart[i] = TimeScript.pastTime;
                     activeBuffNumber++;
                 }
 

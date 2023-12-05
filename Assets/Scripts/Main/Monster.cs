@@ -74,6 +74,10 @@ public class Monster : MonoBehaviour
             GameSystem.combo++;
             SoundEffect.sound3Trigger = true;
             Destroy(this.gameObject);
+
+            Vector3 effectPos = this.transform.position;
+            GameObject effectObj = (GameObject)Resources.Load("EnemyDissapear");
+            Instantiate(effectObj, effectPos, Quaternion.identity);
         }
     }
 
@@ -82,10 +86,10 @@ public class Monster : MonoBehaviour
         if(other.gameObject.name == "Player") 
         {
               
-            int rnd1 = Random.Range(-1000, 1000);
-            int rnd2 = Random.Range(0, 1000);
-            Vector2 randomForce = new Vector2(rnd1, rnd2);
+            int rnd1 = Random.Range(-1200, 1200);
+            Vector2 randomForce = new Vector2(rnd1, 0);
             other.gameObject.GetComponent<Rigidbody2D>().AddForce(randomForce);
+            player.isDown = true;
         }
     }
     void OnCollisionStay2D(Collision2D other)

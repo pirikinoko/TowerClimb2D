@@ -15204,6 +15204,7 @@ MonoBehaviour:
   isCrouch: 0
   isSlide: 0
   speceKeyPressed: 0
+  isDown: 0
   jumpCount: 0
   lastNum: 0
   attackCol: {fileID: 1390729234}
