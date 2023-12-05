@@ -20,8 +20,8 @@ public class Player : MonoBehaviour
     public Text DebugText;
     public static float avgSpeedY;
     public Vector2 defaultPos;
-    public float speed, jumpForce;
-    float Gravity = 3500, elapsedTime, wallJumpTime, attackSign, attackDuration = 1.0f, slideDuration, speedYGoal, lastTIme, updateTextPeriod;
+    public float  jumpForce, nomalSpeed;
+    float Gravity = 3500, elapsedTime, wallJumpTime, attackSign, attackDuration = 1.0f, slideDuration, speedYGoal, lastTIme, updateTextPeriod, slideCD, speed;
     string wallSide;
     Vector3 latestPos, playerPos;
     Vector2 playerSpeed, defaultSize;
@@ -142,11 +142,20 @@ public class Player : MonoBehaviour
         Vector2 rayOrigin = player.transform.position;
         rayOrigin.y -= 0.2f;
         // Ray の方向（下向き）
-        Vector2 rayDirection = Vector2.down;
+        Vector2 rayDirectionDown = Vector2.down;
 
         // Raycast の結果を格納する RaycastHit2D 変数
-        RaycastHit2D hit = Physics2D.Raycast(rayOrigin, rayDirection, distance, layer);
-        if (!(other.gameObject.CompareTag("Enemy")) && hit.collider == null)
+        RaycastHit2D hitVertical = Physics2D.Raycast(rayOrigin, rayDirectionDown, distance, layer);
+
+        distance = 0.3f;
+        rayOrigin.y += 0.2f;
+        Vector2 rayDirectionLeft = Vector2.left;
+        Vector2 rayDirectionRight = Vector2.right;
+        rayOrigin.x -= 0.1f;
+        RaycastHit2D hitLeft = Physics2D.Raycast(rayOrigin, rayDirectionLeft, distance, layer);
+        rayOrigin.x += 0.2f;
+        RaycastHit2D hitRight = Physics2D.Raycast(rayOrigin, rayDirectionRight, distance, layer);
+        if (!(other.gameObject.CompareTag("Enemy")) && (hitVertical.collider == null && (hitLeft.collider != null || hitRight.collider != null)))
         {
             //Debug.Log("HitCollider == null");
             string colname = other.gameObject.name;
@@ -158,7 +167,7 @@ public class Player : MonoBehaviour
                 wallName = other.gameObject.name;
             }
         }
-        else
+        else 
         {
             if (legOnGround)
             {
@@ -173,12 +182,8 @@ public class Player : MonoBehaviour
     }
     private void OnCollisionExit2D(Collision2D other)
     {
-        //床から離れたときジャンプした判定
-        if (other.gameObject.CompareTag("Surface"))
-        {
             jumpCount = 1;
             onGround = false;
-        }
         //壁から離れたとき
         if (other.gameObject.CompareTag("Wall"))
         {
@@ -259,7 +264,7 @@ public class Player : MonoBehaviour
         Vector2 position = transform.position;
         if (isSlide)
         {
-            speed = 1.3f;
+            speed = nomalSpeed * 1.5f;
             Vector2 direction = gameObject.transform.localScale;
             position.x -= (direction.x * 10) * speed * Time.deltaTime;
             transform.position = position;
@@ -267,14 +272,14 @@ public class Player : MonoBehaviour
         }
         else if (isAttacking)
         {
-            speed = 0.7f;
+            speed =nomalSpeed * 0.7f;
         }
         else
         {
-            speed = 1.0f;
+            speed = nomalSpeed;
         }
         //ADキーで移動
-        if (jumpCount < 2 && Input.GetKey(KeyCode.A))
+        if (Input.GetKey(KeyCode.A))
         {
             position.x -= speed * Time.deltaTime;
             if (speceKeyPressed == false && playerSpeed.y < 0)
@@ -295,7 +300,7 @@ public class Player : MonoBehaviour
 
 
         }
-        else if (jumpCount < 2 && Input.GetKey(KeyCode.D))
+        else if (Input.GetKey(KeyCode.D))
         {
             position.x += speed * Time.deltaTime;
             if (speceKeyPressed == false && playerSpeed.y < 0)
@@ -336,6 +341,7 @@ public class Player : MonoBehaviour
             }
             else { rbody2D.velocity = new Vector2(0f, jumpForce); }
             */
+            /*
             if(onWall && wallSide == "Left") 
             {
                 rbody2D.velocity = new Vector2(1, jumpForce);
@@ -348,6 +354,8 @@ public class Player : MonoBehaviour
             {
                 rbody2D.velocity = new Vector2(0, jumpForce);
             }
+            */
+            rbody2D.velocity = new Vector2(0, jumpForce);
             jumpCount++;
             speceKeyPressed = true;
         }
@@ -367,7 +375,7 @@ public class Player : MonoBehaviour
             speceKeyPressed = false;
             if (playerSpeed.y > 0)
             {
-                rbody2D.velocity = new Vector2(playerSpeed.x / 2.5f, 0.5f);
+                rbody2D.velocity = new Vector2(0, 0.5f);
             }
         }
 
@@ -406,7 +414,7 @@ public class Player : MonoBehaviour
             attackDuration = 1.0f;
         }
 
-        if (0.1f < attackDuration && attackDuration < 0.40f)   //攻撃の当たり判定ON
+        if (0.05f < attackDuration && attackDuration < 0.45f)   //攻撃の当たり判定ON
         {
             attackCol.gameObject.SetActive(true);
         }
@@ -423,10 +431,11 @@ public class Player : MonoBehaviour
         if (!isAttacking && onGround && (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.M)))
         {
             col2d.size = new Vector2(1, 1.8f);
-            if (playerSpeed.x < 0 || 0 < playerSpeed.x)
+            if ((playerSpeed.x < 0 || 0 < playerSpeed.x) && slideCD > 1)
             {
                 isSlide = true;
                 slideDuration = 0f;
+                slideCD = 0;
             }
             else
             {
@@ -459,6 +468,7 @@ public class Player : MonoBehaviour
                 animeState = "idle";
             }
         }
+        slideCD += Time.deltaTime;
     }
     void getTiles()
     {

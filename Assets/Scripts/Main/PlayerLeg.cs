@@ -14,17 +14,11 @@ public class PlayerLeg : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("Surface"))
-        {
-            player.legOnGround = true;      
-        }
+          player.legOnGround = true;      
     }
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("Surface"))
-        {
-            player.legOnGround = false;
-        }
+          player.legOnGround = false;
     }
 
 }
