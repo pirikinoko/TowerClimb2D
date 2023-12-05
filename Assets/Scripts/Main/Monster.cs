@@ -81,9 +81,11 @@ public class Monster : MonoBehaviour
     {
         if(other.gameObject.name == "Player") 
         {
-            int rnd1 = Random.Range(0, 0);
-            int rnd2 = Random.Range(-1, 1);
-            other.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(rnd1, rnd2);
+              
+            int rnd1 = Random.Range(-1000, 1000);
+            int rnd2 = Random.Range(0, 1000);
+            Vector2 randomForce = new Vector2(rnd1, rnd2);
+            other.gameObject.GetComponent<Rigidbody2D>().AddForce(randomForce);
         }
     }
     void OnCollisionStay2D(Collision2D other)

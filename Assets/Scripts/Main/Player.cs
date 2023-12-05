@@ -375,7 +375,7 @@ public class Player : MonoBehaviour
             speceKeyPressed = false;
             if (playerSpeed.y > 0)
             {
-                rbody2D.velocity = new Vector2(0, 0.5f);
+                rbody2D.velocity = new Vector2(playerSpeed.x / 5.5f, 0.5f);
             }
         }
 

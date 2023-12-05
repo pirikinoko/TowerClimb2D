@@ -15210,8 +15210,8 @@ MonoBehaviour:
   tilemap: {fileID: 0}
   DebugText: {fileID: 1004466033}
   defaultPos: {x: 0, y: -3.8}
-  speed: 1
   jumpForce: 2.2
+  nomalSpeed: 1
 --- !u!95 &1458599075
 Animator:
   serializedVersion: 3
