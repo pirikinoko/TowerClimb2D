@@ -54,9 +54,14 @@ public class ScoreFeedBack : MonoBehaviour
             if (BuffManagement.buffTrigger[0] && spownTime[SFBNum] > BuffManagement.buffStart[0])
             {
                 scoreFeedBackGO[SFBNum].AddComponent<GainScoresAnime>();
-                scoreFeedBackGO[SFBNum].GetComponent<GainScoresAnime>();
                 scoreFeedBackGO[SFBNum].GetComponent<GainScoresAnime>().scoreDisplay = diffBeforeMulti;
                 scoreFeedBackGO[SFBNum].GetComponent<GainScoresAnime>().diffGoal = scoreDiff;
+                Vector2 buffMultiPos = scoreFeedBackGO[SFBNum].transform.position;
+                buffMultiPos.x += 0.2f;
+                buffMultiPos.y += 0.2f;
+                GameObject buffMultiPrefab = (GameObject)Resources.Load("BuffMultiText");
+                buffMultiTextGO[SFBNum] = Instantiate(buffMultiPrefab, buffMultiPos, Quaternion.identity, parentObject);
+                buffMultiTextGO[SFBNum].name = "BuffMultiText" + SFBNum;
             }
             textColor[SFBNum] = scoreFeedBackTX[SFBNum].color;
             if (BuffManagement.buffTrigger[0])
@@ -76,7 +81,6 @@ public class ScoreFeedBack : MonoBehaviour
 
             textAlpha[SFBNum] = 1;
             isWorking[SFBNum] = true;
-            coloutineCount[SFBNum] = 0;
             scoreDiff = 0;
             diffBeforeMulti = 0;
 
@@ -90,22 +94,9 @@ public class ScoreFeedBack : MonoBehaviour
         {
             if (isWorking[i])
             {
-
-
                 textAlpha[i] -= 0.4f * Time.deltaTime;
                 activeTime[i] -= 0.6f * Time.deltaTime;
 
-                if (BuffManagement.buffTrigger[0] && coloutineCount[i] == 0)
-                {
-                    if (scoreFeedBackGO[i] == null) { return; }
-                    Vector2 buffMultiPos = scoreFeedBackGO[i].transform.position;
-                    buffMultiPos.x += 0.2f;
-                    buffMultiPos.y += 0.2f;
-                    GameObject buffMultiPrefab = (GameObject)Resources.Load("BuffMultiText");
-                    buffMultiTextGO[i] = Instantiate(buffMultiPrefab, buffMultiPos, Quaternion.identity, parentObject);
-                    buffMultiTextGO[i].name = "BuffMultiText" + i;
-                    coloutineCount[i] = 1;
-                }
 
                 if (activeTime[i] < 0)
                 {

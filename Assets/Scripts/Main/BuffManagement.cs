@@ -59,7 +59,7 @@ public class BuffManagement : MonoBehaviour
                     activeBuffNumber--;
                 }
             }
-
+ 
             for (int j = 0; j < activeBuffNumber; j++)
             {
                 imageAlpha[j] -= Time.deltaTime / setTime[i];

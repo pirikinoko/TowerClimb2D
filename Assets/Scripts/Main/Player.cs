@@ -21,7 +21,7 @@ public class Player : MonoBehaviour
     public static float avgSpeedY;
     public Vector2 defaultPos;
     public float  jumpForce, nomalSpeed;
-    float Gravity = 3500, elapsedTime, wallJumpTime, attackSign, attackDuration = 1.0f, slideDuration, speedYGoal, lastTIme, updateTextPeriod, slideCD, speed, downCD;
+    float Gravity = 3200, elapsedTime, wallJumpTime, attackSign, attackDuration = 1.0f, slideDuration, speedYGoal, lastTIme, updateTextPeriod, slideCD, speed, downCD;
     string colType;
     Vector3 latestPos, playerPos;
     Vector2 playerSpeed, defaultSize;
@@ -369,7 +369,7 @@ public class Player : MonoBehaviour
             attackDuration = 1.0f;
         }
 
-        if (0.05f < attackDuration && attackDuration < 0.45f)   //攻撃の当たり判定ON
+        if (0.05f < attackDuration && attackDuration < 0.4f)   //攻撃の当たり判定ON
         {
             attackCol.gameObject.SetActive(true);
         }

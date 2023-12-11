@@ -76,6 +76,7 @@ public class Monster : MonoBehaviour
             Destroy(this.gameObject);
 
             Vector3 effectPos = this.transform.position;
+            effectPos.y += 0.2f;
             GameObject effectObj = (GameObject)Resources.Load("EnemyDissapear");
             Instantiate(effectObj, effectPos, Quaternion.identity);
         }

@@ -12,6 +12,10 @@ public class GainScoresAnime : MonoBehaviour
     {
         if (this.gameObject.name.Contains("Multi"))
         {
+            if (!BuffManagement.buffTrigger[0])
+            {
+                Destroy(this.gameObject);
+            }
             StartCoroutine(MultiTextDisplay());
         }
         else
