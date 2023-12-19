@@ -20,7 +20,9 @@ public class Collision : MonoBehaviour
             if (this.gameObject.CompareTag("Wall"))
             {
                 if(count == 0)
-                { 
+                {
+                    GameObject scoreEffect = (GameObject)Resources.Load("ScoreEffect");
+                    Instantiate(scoreEffect, other.transform.position, Quaternion.identity);
                     this.gameObject.GetComponent<Light2D>().intensity = 0;
                     SoundEffect.sound3Trigger = true;
                     GameSystem.combo++;
@@ -36,7 +38,9 @@ public class Collision : MonoBehaviour
             if (this.gameObject.CompareTag("Surface"))
             {
                 if(count == 0)
-                {  
+                {
+                    GameObject scoreEffect = (GameObject)Resources.Load("ScoreEffect");
+                    Instantiate(scoreEffect, other.transform.position, Quaternion.identity);
                     this.gameObject.GetComponent<Light2D>().intensity = 0;
                     SoundEffect.sound3Trigger = true;
                     GameSystem.combo++;

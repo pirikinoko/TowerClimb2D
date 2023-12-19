@@ -69,7 +69,7 @@ public class TopBar : MonoBehaviour
     {
         Destroy(iconObj[toDestroy]);
         BuffManagement.buffTrigger[0] = true;
-        SoundEffect.sound5Trigger = true;
+        SoundEffect.sound6Trigger = true;
     }
     void Effect2(int toDestroy)
     {
