@@ -22,7 +22,7 @@ public class Player : MonoBehaviour
     public static float avgSpeedY;
     public Vector2 defaultPos;
     public float  jumpForce, nomalSpeed;
-    float Gravity = 3200, elapsedTime, wallJumpTime, attackSign, attackDuration = 1.0f, slideDuration, speedYGoal, lastTIme, updateTextPeriod, slideCD, speed, downCD;
+    float Gravity = 2800, elapsedTime, wallJumpTime, attackSign, attackDuration = 0.5f, slideDuration, speedYGoal, lastTIme, updateTextPeriod, slideCD, speed, downCD;
     string colType;
     Vector3 latestPos, playerPos;
     Vector2 playerSpeed, defaultSize;
@@ -142,8 +142,6 @@ public class Player : MonoBehaviour
             if (!onGround)
             {
                 onWall = true;
-                isAttacking = false;
-                attackDuration = 1.0f;
                 if (hitLeft) 
                 {
                     colType = "Left";
@@ -218,6 +216,7 @@ public class Player : MonoBehaviour
                  
                 }
                 jumpCount = 0;
+                onWall = false;
                 wallflag = false;
                 onGround = true;
                 colType = "Floor";
@@ -271,11 +270,11 @@ public class Player : MonoBehaviour
         }
         else if (isAttacking)
         {
-            speed =nomalSpeed * 0.7f;
+            speed = nomalSpeed * 0.7f;
         }
         else if (isCrouch)
         {
-            speed = - 0f;
+            speed = 0;
         }
         else
         {
@@ -286,7 +285,7 @@ public class Player : MonoBehaviour
         {
             if (gameObject.transform.localScale.x < 0) 
             {
-                if (!isAttacking && !isSlide)
+                if (!isSlide)
                 {
                     Vector2 direction = new Vector2(0.1f, 0.1f);
                     gameObject.transform.localScale = direction;
@@ -317,7 +316,7 @@ public class Player : MonoBehaviour
         {
             if (gameObject.transform.localScale.x > 0)
             {
-                if (!isAttacking && !isSlide)
+                if (!isSlide)
                 {
                     Vector2 direction = new Vector2(-0.1f, 0.1f);
                     gameObject.transform.localScale = direction;
@@ -383,7 +382,7 @@ public class Player : MonoBehaviour
             speceKeyPressed = false;
             if (playerSpeed.y > 0)
             {
-                rbody2D.velocity = new Vector2(playerSpeed.x / 5.5f, 0.5f);
+                rbody2D.velocity = new Vector2(rbody2D.velocity.x, 0.5f);
             }
         }
 
@@ -410,17 +409,17 @@ public class Player : MonoBehaviour
         {
             isAttacking = false;
             animeState = "idle";
-            attackDuration = 1.0f;
+            attackDuration = 0.5f;
         }
 
-        if (0.3f < attackDuration && attackDuration < 0.9f)   //攻撃の当たり判定ON
+        if (0f < attackDuration && attackDuration < 0.5f)   //攻撃の当たり判定ON
         {
             attackCol.gameObject.SetActive(true);
         }
         else { attackCol.gameObject.SetActive(false); }
 
         colPos.x += gameObject.transform.localScale.x * -1f;
-        colPos.y -= 0.05f;
+        colPos.y -= 0.02f;
         attackCol.transform.position = colPos;
 
     }

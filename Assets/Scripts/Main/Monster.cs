@@ -39,7 +39,11 @@ public class Monster : MonoBehaviour
         MonsterPos.x += speed * Time.deltaTime;
         if (MonsterPos.x >= defaultPos.x + rightLimit || MonsterPos.x < defaultPos.x - leftLimit)
         {
-            Turn();
+            if (onSurface)
+            {
+                Turn();
+            }
+
         }
         jumpCD -= 10 * Time.deltaTime;
         if(jumpCD < 0)
@@ -47,18 +51,18 @@ public class Monster : MonoBehaviour
             Jump();
             jumpCD = Random.Range(10, 50);
         }
-        Vector2 nowvelocity = rb2D.velocity;
         this.transform.position = MonsterPos;
         Disapper();
-        //rb2D.velocity = nowvelocity;
+
 
         //速度
         monsterVector = ((MonsterPos - latestPos) / Time.deltaTime);
         latestPos = MonsterPos;
 
-        if (monsterVector.y < -3.5f)
+        if (monsterVector.y < -1.5f)
         {
-            rb2D.velocity = new Vector2(0, -3.5f);
+            rb2D.velocity = new Vector2(rb2D.velocity.x, -1.5f);
+
         }
     }
 
@@ -82,17 +86,17 @@ public class Monster : MonoBehaviour
         }
     }
 
-    void OnCollisionEnter2D(Collision2D other) 
-    {
-        if(other.gameObject.name == "Player") 
-        {
-              
-            int rnd1 = Random.Range(-1200, 1200);
-            Vector2 randomForce = new Vector2(rnd1, 0);
-            other.gameObject.GetComponent<Rigidbody2D>().AddForce(randomForce);
-            player.isDown = true;
-        }
-    }
+    //void OnCollisionEnter2D(Collision2D other)
+    //{
+    //    if (other.gameObject.name == "Player")
+    //    {
+
+    //        int rnd1 = Random.Range(-1200, 1200);
+    //        Vector2 randomForce = new Vector2(rnd1, 0);
+    //        other.gameObject.GetComponent<Rigidbody2D>().AddForce(randomForce);
+    //        player.isDown = true;
+    //    }
+    //}
     void OnCollisionStay2D(Collision2D other)
     {
         if (other.gameObject.name.Contains("Floor") && (saveFloorName != other.gameObject.name))
@@ -123,8 +127,8 @@ public class Monster : MonoBehaviour
 
         if (other.gameObject.CompareTag("Enemy"))
         {
-            int rnd1 = Random.Range(-3, 3);
-            int rnd2 = Random.Range(-3, 3);
+            int rnd1 = Random.Range(-2, 2);
+            int rnd2 = Random.Range(-2, 2);
             other.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(rnd1, rnd2);
         }
 
@@ -138,7 +142,7 @@ public class Monster : MonoBehaviour
     {
         if (onSurface)
         {
-            rb2D.velocity = new Vector2(0, jumpForce);
+            rb2D.velocity = new Vector2(rb2D.velocity.x, jumpForce);
             onSurface = false;
 
         }

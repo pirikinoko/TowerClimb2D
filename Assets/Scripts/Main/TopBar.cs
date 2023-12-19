@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class TopBar : MonoBehaviour
 {
-    const int Iconval = 2;
+    const int Iconval = 2, maxEnemy = 7;
     GameObject[] iconObj = new GameObject[Iconval];
     Vector2 iconStartPos, iconEndPos;
-    const float generateDuration = 15, maxEnemy = 10;
+    const float generateDuration = 15;
     float generateTimer, speed = 0.05f;
     string[] icons = { "BuffIcon", "SlimeIcon", "Pixel3" };
     int objCount = 0;
@@ -86,17 +86,18 @@ public class TopBar : MonoBehaviour
 
     IEnumerator GenerateSlimes()
     {
-        GameObject[] enemies = new GameObject[10];
+        GameObject[] enemies = new GameObject[maxEnemy];
         GameObject enemyObj = (GameObject)Resources.Load("slime");
         for (int i = 0; i < maxEnemy; i++)
         {
-            Vector2 generatePos = GameObject.Find("Player").transform.position;
+            Vector2 generatePos = Vector2.zero;
+            generatePos.y = GameObject.Find("Player").transform.position.y;
             generatePos.y += 3;
             enemies[i] = Instantiate(enemyObj, generatePos, Quaternion.identity);
-            int rnd1 = Random.Range(-2, 2);
-            int rnd2 = Random.Range(-2, 2);
-            enemies[i].GetComponent<Rigidbody2D>().velocity =  new Vector2(rnd1, rnd2);
-            yield return new WaitForSeconds(0.4f);
+            int rnd1 = Random.Range(-5000, 5000);
+            int rnd2 = Random.Range(0, 2000);
+            enemies[i].GetComponent<Rigidbody2D>().AddForce(new Vector2(rnd1, rnd2));
+            yield return new WaitForSeconds(0.5f);
         }
 
     }
