@@ -1,15 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Experimental.Rendering.Universal;
 public class Collision : MonoBehaviour
 {
     int count = 0;
     float buffMulti;
     const int scoreBased = 10;
+    SoundEffect soundEffect;
     // Start is called before the first frame update
     void Start()
     {
+    
+        soundEffect = GameObject.Find("AudioSystem").GetComponent<SoundEffect>();
         count = 0;
     }
     private void OnCollisionEnter2D(Collision2D other)
@@ -24,7 +28,7 @@ public class Collision : MonoBehaviour
                     GameObject scoreEffect = (GameObject)Resources.Load("ScoreEffect");
                     Instantiate(scoreEffect, other.transform.position, Quaternion.identity);
                     this.gameObject.GetComponent<Light2D>().intensity = 0;
-                    SoundEffect.sound3Trigger = true;
+                    soundEffect.PlaySE(2);
                     GameSystem.combo++;
                     GameSystem.score += scoreCalc();
                     TimeScript.elapsedTime += 1;
@@ -42,7 +46,7 @@ public class Collision : MonoBehaviour
                     GameObject scoreEffect = (GameObject)Resources.Load("ScoreEffect");
                     Instantiate(scoreEffect, other.transform.position, Quaternion.identity);
                     this.gameObject.GetComponent<Light2D>().intensity = 0;
-                    SoundEffect.sound3Trigger = true;
+                    soundEffect.PlaySE(2);
                     GameSystem.combo++;
                     GameSystem.score += scoreCalc();
                     TimeScript.elapsedTime += 1;
@@ -55,11 +59,19 @@ public class Collision : MonoBehaviour
             {
                GameSystem.score -= 5;
                GameSystem.combo = 0;
-               SoundEffect.sound1Trigger = true;
-               Debug.Log(other.gameObject.name + "と衝突しました");
+                soundEffect.PlaySE(0);
+                Debug.Log(other.gameObject.name + "と衝突しました");
                Destroy(this.gameObject);
             }
             ScoreFeedBack.diffBeforeMulti = ScoreFeedBack.scoreDiff / buffMulti;
+
+            if (this.gameObject.name.Contains("Event")) 
+            {
+                EventSlot eventSlot = GameObject.Find("SlotItem").GetComponent<EventSlot>();
+                gameObject.GetComponent<SpriteRenderer>().enabled = false;
+                gameObject.GetComponent<CircleCollider2D>().enabled = false;
+                StartCoroutine(eventSlot.RollSlot(this.gameObject.name));
+            }
         }
         
     }

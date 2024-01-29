@@ -30,6 +30,7 @@ public class Player : MonoBehaviour
     int calcCount = 0;
     const int nullNumber = -999;
     float[] speedDefault = new float[2], jumpForceDefault = new float[2];
+
     void Start()
     {
         isDown = false;
@@ -63,7 +64,6 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        Debug.Log("colType" + colType);
         //重力付与
         rbody2D.AddForce(transform.up * -Gravity * Time.deltaTime);
         Vector3 legPos = playerPos; legPos.y -= 0.12f;

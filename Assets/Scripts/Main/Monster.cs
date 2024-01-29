@@ -15,6 +15,7 @@ public class Monster : MonoBehaviour
     int colFloorLength = 0;
     bool onSurface = false;
     GenerateStage generateStage;
+    SoundEffect soundEffect;
     // Start is called before the first frame update
     void Start()
     {
@@ -28,6 +29,7 @@ public class Monster : MonoBehaviour
         rb2D = this.GetComponent<Rigidbody2D>();
         player = GameObject.Find("Player").GetComponent<Player>();
         generateStage = GameObject.Find("GameSystem").GetComponent<GenerateStage>();
+        soundEffect = GameObject.Find("AudioSystem").GetComponent<SoundEffect>();
     }
 
     // Update is called once per dadaDadad
@@ -76,7 +78,7 @@ public class Monster : MonoBehaviour
             ScoreFeedBack.scoreDiff = scoreCalc();
             TimeScript.elapsedTime += 3.0f;
             GameSystem.combo++;
-            SoundEffect.sound3Trigger = true;
+            soundEffect.PlaySE(2);
             Destroy(this.gameObject);
 
             Vector3 effectPos = this.transform.position;

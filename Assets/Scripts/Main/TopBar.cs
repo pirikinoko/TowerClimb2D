@@ -12,9 +12,11 @@ public class TopBar : MonoBehaviour
     string[] icons = { "BuffIcon", "SlimeIcon", "Pixel3" };
     int objCount = 0;
     int[] eventType = new int[10];
+    SoundEffect soundEffect;
     // Start is called before the first frame update
     void Start()
     {
+        soundEffect = GameObject.Find("AudioSystem").GetComponent<SoundEffect>();
         objCount = 0;
     }
 
@@ -69,19 +71,19 @@ public class TopBar : MonoBehaviour
     {
         Destroy(iconObj[toDestroy]);
         BuffManagement.buffTrigger[0] = true;
-        SoundEffect.sound6Trigger = true;
+        soundEffect.PlaySE(5);
     }
     void Effect2(int toDestroy)
     {
         Destroy(iconObj[toDestroy]);
         StartCoroutine(GenerateSlimes());
-      
-        SoundEffect.sound5Trigger = true;
+
+        soundEffect.PlaySE(4);
     }
     void Effect3(int toDestroy)
     {
         Destroy(iconObj[toDestroy]);
-        SoundEffect.sound5Trigger = true;
+        soundEffect.PlaySE(4);
     }
 
     IEnumerator GenerateSlimes()

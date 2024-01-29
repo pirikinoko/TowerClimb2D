@@ -16,6 +16,8 @@ public class GameSystem : MonoBehaviour
     public static bool playable = true;
     Vector2 goalPos; //ゴールした時のプレイヤー位置
     GenerateStage generateStage;
+    SoundEffect soundEffect;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -31,6 +33,7 @@ public class GameSystem : MonoBehaviour
         comboTextGO = GameObject.Find("Combo");
         resultPanel.gameObject.SetActive(false);
         generateStage = GameObject.Find("GameSystem").GetComponent<GenerateStage>();
+        soundEffect = GameObject.Find("AudioSystem").GetComponent<SoundEffect>();
     }
 
     // Update is called once per frame
@@ -63,7 +66,7 @@ public class GameSystem : MonoBehaviour
                 resultTime += TimeScript.pastTime / 1500;
                 if (resultTime >= TimeScript.pastTime)
                 {
-                    SoundEffect.sound2Trigger = true;
+                    soundEffect.PlaySE(1);
                 }
                 yield return new WaitForSeconds(0.3f);
             }
@@ -72,7 +75,7 @@ public class GameSystem : MonoBehaviour
                 resultScore += score / 1500;
                 if (resultScore == score)
                 {
-                    SoundEffect.sound1Trigger = true;
+                    soundEffect.PlaySE(0);
                 }
                yield return new WaitForSeconds(0.3f);
             }     

@@ -13,7 +13,7 @@ public class TimeScript : MonoBehaviour
     public float setTime;
     float soundTime = 1f;
     bool startFlag;
-
+    SoundEffect soundEffect;
     // Start is called before the first frame update
     void Start()
     {
@@ -21,12 +21,11 @@ public class TimeScript : MonoBehaviour
         playTime = setTime;
         elapsedTime = setTime;
         pastTime = 0;
-        soundTime = 1f;
+        soundTime = -1;
         startTime = 3f;
         startFlag = true;
         countDown.text = ("3");
-        SoundEffect.sound2Trigger = true;
-
+        soundEffect = GameObject.Find("AudioSystem").GetComponent<SoundEffect>();
     }
 
     // Update is called once per frame
@@ -38,6 +37,7 @@ public class TimeScript : MonoBehaviour
             loadAnimGO.SetActive(false);
         }
     }
+
     void TimerStart()
     {
         //カウントダウン
@@ -69,13 +69,13 @@ public class TimeScript : MonoBehaviour
             }
             if (soundTime < 0)
             {
-                SoundEffect.sound2Trigger = true;
+                soundEffect.PlaySE(1);
                 soundTime = 1;
             }
         }
         //ゲームスタート
         if (startTime < 0)
-        {
+        {      
             if (GameSystem.playable)
             {
                 pastTime += Time.deltaTime;
