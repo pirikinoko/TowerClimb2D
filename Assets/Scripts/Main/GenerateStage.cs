@@ -11,20 +11,21 @@ public class GenerateStage : MonoBehaviour
     [SerializeField] GameObject[] frames;
     [SerializeField] Text heightText;
     GameObject[] obj = new GameObject[objUnit];
-    GameObject[] enemy = new GameObject[5];
+    GameObject[] slimes = new GameObject[5];
+    GameObject[] bats = new GameObject[10];
     GameObject[] objForCheckLength;
     const int Floor = 0, Wall = 1, Right = 0, Left = 1, objUnit = 30, nullNumber = 99999;
     const float rightLimit = 1.8f, leftLimit = -2.1f;
     string [,] objNames = { { "Floor1", "Floor2", "Floor3", "Floor4" }, { "Wall1", "Wall2", "Wall3" , "Wall4"} };
     public float  [,] eachLength = new float[2,4];
-    float xMax = 0, xMin = 0, yMax = 0, yMin = 0, playerYPrev, sizeX, sizeY, posX = -10, posY = 0, difficulty = 30;
+    float xMax = 0, xMin = 0, yMax = 0, yMin = 0, playerYPrev, sizeX, sizeY, posX = -10, posY = 0, difficulty = 30, lastEItemY;
     bool[] objActive = new bool[objUnit];
     Vector3[] objPos = new Vector3[objUnit];
     Vector2 checkLinePos;
     public float deadLine { get; set; }
     public static int playerHeight;
     int[] objectType = new int[objUnit];
-    int currentObj = 0, prev, prev2, count = 0, target = 0, tileY, objLength, objDirection = 0, enemyCount = 0, startCount, deleteDuration = 5, startHeight, currentHeight;
+    int currentObj = 0, prev, prev2, count = 0, target = 0, tileY, objLength, objDirection = 0, batCount , batMax = 10,slimeCount, slimeMax = 5, startCount, deleteDuration = 5, startHeight, currentHeight;
     public static float[] collisionPos = new float[30];
     // Start is called before the first frame update
     void Start()
@@ -82,8 +83,10 @@ public class GenerateStage : MonoBehaviour
         objectType[0] = 0;
         startCount = 0;
         count = 0;
+        lastEItemY = 0;
         target = 0;
-        enemyCount = 0;
+        slimeCount = 0;
+        batCount = 0;
         deadLine = -7;
         difficulty = 0;
         for (int i = 0; i < 20; i++)
@@ -170,12 +173,25 @@ public class GenerateStage : MonoBehaviour
     {
 
         GameObject parentObject = GameObject.Find("GeneratedObjects");
-        Transform parentTransform = parentObject.transform;// ここに親オブジェクトのTransformを指定;
+        Transform parentTransform = parentObject.transform;
         GameObject prefabObj = (GameObject)Resources.Load(objNames[objectType[targetNum], objLength - 1]);
         obj[targetNum] = Instantiate(prefabObj, objPos[targetNum], Quaternion.identity);
         string[] objDirectionName = {"Right", "Left"};
         obj[targetNum].name = objNames[objectType[targetNum] , objLength - 1]  + objDirectionName[objDirection] + "-" + targetNum.ToString();
         obj[targetNum].transform.SetParent(parentTransform);
+        //イベントアイテム生成
+        if (objPos[targetNum].y > lastEItemY + 7 && objectType[targetNum] == Floor)
+        {
+            Vector2 eItemPos = objPos[targetNum];
+            eItemPos.y += 0.2f;
+            GameObject eItemObj = (GameObject)Resources.Load("EventItem");
+            GameObject eItem = Instantiate(eItemObj, eItemPos , Quaternion.identity);
+            eItem.name = "EventItem" + targetNum.ToString();
+            eItem.transform.SetParent(parentTransform);
+            Debug.Log("dwadadwadad");
+            lastEItemY = objPos[targetNum].y;
+        }
+        //敵オブジェクト生成(スライム)
         if (objectType[targetNum] == Floor && objLength == 4)
         {
             Vector3 enemyPos = objPos[targetNum];
@@ -184,17 +200,30 @@ public class GenerateStage : MonoBehaviour
             candlePos.y += 0.5f;
             GameObject enemyObj = (GameObject)Resources.Load("slime");
             GameObject candleObj = (GameObject)Resources.Load("Candle");
-            enemy[enemyCount] = Instantiate(enemyObj, enemyPos, Quaternion.identity);
+            slimes[slimeCount] = Instantiate(enemyObj, enemyPos, Quaternion.identity);
             GameObject candle = Instantiate(candleObj, candlePos, Quaternion.identity);
 
-            enemy[enemyCount].transform.SetParent(parentTransform);
+            slimes[slimeCount].transform.SetParent(parentTransform);
             candle.transform.SetParent(parentTransform);
-            enemyCount++;
-            if(enemyCount == 5) 
+            slimeCount++;
+            if(slimeCount == slimeMax) 
             {
-                enemyCount = 0;
+                slimeCount = 0;
             }
-
+        }
+        //敵オブジェクト生成(コウモリ)
+        if (targetNum % 10 == 0)
+        {
+            Vector3 batSpownPos = objPos[targetNum];
+            batSpownPos.y += 0.3f;
+            GameObject batObj = (GameObject)Resources.Load("Bat");
+            bats[batCount] = Instantiate(batObj, batSpownPos, Quaternion.identity);
+            bats[batCount].transform.SetParent(parentTransform);
+            batCount++;
+            if (batCount == batMax)
+            {
+                batCount = 0;
+            }
         }
     }
     void SetObjectPos(int targetNum)
