@@ -10,7 +10,11 @@ public class EventSlot : MonoBehaviour
     Image image;
     public int eventNum = 0;
     float slotDuration = 0.04f, RslotDuration = 0.04f, shrinkSpeed = 1.1f, stopTime = 0.6f;
-
+    float additionalTime = 2;
+    //ã‚¹ãƒ©ã‚¤ãƒ ç”¨
+    const int maxEnemy = 7;
+    float generateTimer, speed = 0.05f;
+    int objCount = 0;
     // Start is called before the first frame update
     void Start()
     {
@@ -40,8 +44,10 @@ public class EventSlot : MonoBehaviour
             slotDuration *= shrinkSpeed;
             if(slotDuration > stopTime)
             { 
-                Debug.Log("ƒRƒ‹[ƒ`ƒ“‚ğI—¹‚µ‚Ü‚·"); 
+                Debug.Log("ï¿½Rï¿½ï¿½ï¿½[ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½"); 
                 slotDuration = RslotDuration;
+                if(eventNum == 0) { StartCoroutine(GenerateSlimes()); }
+                else { BuffManagement.buffTrigger[0] = true; }
                 Destroy(GameObject.Find(nameToDestroy));
                 break;
             }
@@ -49,8 +55,7 @@ public class EventSlot : MonoBehaviour
     }
 
 
-    //ƒCƒxƒ“ƒg‡@ƒXƒ‰ƒCƒ€¶¬
-    int maxEnemy = 7;
+
     IEnumerator GenerateSlimes()
     {
         GameObject[] enemies = new GameObject[maxEnemy];
@@ -67,5 +72,10 @@ public class EventSlot : MonoBehaviour
             yield return new WaitForSeconds(0.5f);
         }
 
+    }
+
+    void PlusTime()
+    {
+        TimeScript.elapsedTime += additionalTime;
     }
 }

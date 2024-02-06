@@ -169,6 +169,11 @@ public class Player : MonoBehaviour
                 lastNum = i;
             }
         }
+
+        if(other.gameObject.CompareTag("Enemy"))
+        {
+            StartCoroutine(TurnRed());
+        }
     }
 
     private void OnCollisionStay2D(Collision2D other)
@@ -486,6 +491,14 @@ public class Player : MonoBehaviour
         }
     }
 
+    //ダメージを受ける際にプレイヤーを一瞬赤色にする
+    IEnumerator TurnRed()
+    {
+        SpriteRenderer renderer = this.GetComponent<SpriteRenderer>();
+        renderer.color = Color.red;
+        yield return new WaitForSeconds(0.3f);
+        renderer.color = Color.white;
+    }
     void PlayAnim()
     {
         playerAnim.SetBool("idle", false);

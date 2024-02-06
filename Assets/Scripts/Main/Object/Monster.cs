@@ -6,7 +6,7 @@ public class Monster : MonoBehaviour
 {
     Player player;
     float speed = 0.5f, jumpForce = 1.5f, jumpCD;
-    float buffMulti;
+    float buffMulti, addTime = 1.5f;
     const int scoreBased = 10;
     float rightLimit, leftLimit , posGap;
     Rigidbody2D rb2D;
@@ -76,7 +76,7 @@ public class Monster : MonoBehaviour
             GameSystem.score += scoreCalc();
             SetFeedBackPos(other.transform.position);
             ScoreFeedBack.scoreDiff = scoreCalc();
-            TimeScript.elapsedTime += 3.0f;
+            TimeScript.elapsedTime += addTime;
             GameSystem.combo++;
             soundEffect.PlaySE(2);
             Destroy(this.gameObject);
@@ -166,7 +166,7 @@ public class Monster : MonoBehaviour
         {
             buffMulti = 3.0f;
         }
-        return scoreBased * (GameSystem.combo / 5) * (scoreMultiBySpeed) * buffMulti;
+        return GameSystem.scoreBase * (GameSystem.combo / GameSystem.scorePer) * (scoreMultiBySpeed) * buffMulti;
     }
 
     void SetFeedBackPos(Vector2 collisionPos)

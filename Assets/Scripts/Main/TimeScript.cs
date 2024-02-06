@@ -5,39 +5,112 @@ using UnityEngine.UI;
 
 public class TimeScript : MonoBehaviour
 {
-
+    public GameObject timeGO, canvasObj;
     public Text timer;
     public Text countDown;
+    public Text startText;
     public GameObject loadAnimGO;
     public static float elapsedTime , playTime, pastTime, startTime = 3f; //操作用, 表示用, 総経過時間, カウントダウン
-    public float setTime;
-    float soundTime = 1f;
-    bool startFlag;
+    public float setTime, timeLastFrame;
+    float soundTime = 1f, changeSpeed = 1, minOpacity = 0, maxOpacity = 1;
+    bool startFlag, increasingOpacity;
+    bool sizeEffectCoroutine;
     SoundEffect soundEffect;
     // Start is called before the first frame update
     void Start()
     {
         //loadAnimGO.SetActive(true);
         playTime = setTime;
+        timeLastFrame = setTime;
         elapsedTime = setTime;
         pastTime = 0;
         soundTime = -1;
         startTime = 3f;
-        startFlag = true;
-        countDown.text = ("3");
+        startFlag = false;
+        sizeEffectCoroutine = false;
+        countDown.text = ("");
         soundEffect = GameObject.Find("AudioSystem").GetComponent<SoundEffect>();
+        startText.text = "スペースを押してスタート";
     }
 
     // Update is called once per frame
     void Update()
     {
+     
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            startFlag = true;
+        }
         TimerStart();
         if(pastTime > 10)
         {
             loadAnimGO.SetActive(false);
         }
+
+        //スタート前表示
+        if (startFlag == false)
+        {
+            Color currentColor = startText.color;
+            if (increasingOpacity)
+            {
+                currentColor.a += changeSpeed * Time.deltaTime;
+                if (currentColor.a >= maxOpacity)
+                {
+                    currentColor.a = maxOpacity;
+                    increasingOpacity = false;
+                }
+            }
+            else
+            {
+                currentColor.a -= changeSpeed * Time.deltaTime;
+                if (currentColor.a <= minOpacity)
+                {
+                    currentColor.a = minOpacity;
+                    increasingOpacity = true;
+                }
+            }
+
+            // 変更した透明度を適用
+            startText.color = currentColor;
+            Debug.Log(startText.color);
+        }
+        else
+        {
+            startText.text = "";
+        }
+
     }
 
+    //private void FixedUpdate()
+    //{
+    //    if (startFlag == false)
+    //    {
+    //        Color currentColor = startText.color;
+    //        if (increasingOpacity)
+    //        {
+    //            currentColor.a += changeSpeed * Time.deltaTime;
+    //            if (currentColor.a >= maxOpacity)
+    //            {
+    //                currentColor.a = maxOpacity;
+    //                increasingOpacity = false;
+    //            }
+    //        }
+    //        else
+    //        {
+    //            currentColor.a -= changeSpeed * Time.deltaTime;
+    //            if (currentColor.a <= minOpacity)
+    //            {
+    //                currentColor.a = minOpacity;
+    //                increasingOpacity = true;
+    //            }
+    //        }
+
+    //        // 変更した透明度を適用
+    //        startText.color = currentColor;
+    //        Debug.Log(startText.color);
+    //    }
+    //}
     void TimerStart()
     {
         //カウントダウン
@@ -82,10 +155,42 @@ public class TimeScript : MonoBehaviour
                 elapsedTime -= Time.deltaTime;
                 playTime = elapsedTime * 10;
                 playTime = Mathf.Floor(playTime) / 10;
-                timer.text = ("タイム:" + playTime);
+                timer.text = (playTime.ToString());
             }
 
         }
+
+        //タイム延長エフェクト
+        if (playTime > timeLastFrame && sizeEffectCoroutine == false)
+        {
+            Vector2 generatePos = timeGO.transform.position;
+            generatePos.x += 0.5f;
+            StartCoroutine(SizeEffect(timer, 100, 130));
+            //GameObject textPrefab = (GameObject)Resources.Load("TextPrefab");
+            //GameObject textObj = Instantiate(textPrefab, generatePos, Quaternion.identity);
+        }
+        timeLastFrame = playTime;
+    }
+
+    IEnumerator SizeEffect(Text text, int originalSize, int maxSize)
+    {
+        sizeEffectCoroutine = true;
+        text.fontSize = originalSize;
+        int n = 350;
+        while (text.fontSize <= maxSize)
+        {
+            text.fontSize += (int)(n * Time.deltaTime);
+            if (text.fontSize % 2 == 0) { yield return null; }
+        }
+
+        //yield return new WaitForSeconds(0.1f);
+
+        while (text.fontSize >= originalSize)
+        {
+            text.fontSize -= (int)(n * Time.deltaTime);
+            if (text.fontSize % 2 == 0) { yield return null; }
+        }
+        sizeEffectCoroutine = false;
     }
 }
 

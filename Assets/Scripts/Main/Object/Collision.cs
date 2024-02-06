@@ -6,7 +6,7 @@ using UnityEngine.Experimental.Rendering.Universal;
 public class Collision : MonoBehaviour
 {
     int count = 0;
-    float buffMulti;
+    float buffMulti, addTimeEnemy = 2, addTimeCol = 0.3f;
     const int scoreBased = 10;
     SoundEffect soundEffect;
     // Start is called before the first frame update
@@ -31,7 +31,7 @@ public class Collision : MonoBehaviour
                     soundEffect.PlaySE(2);
                     GameSystem.combo++;
                     GameSystem.score += scoreCalc();
-                    TimeScript.elapsedTime += 1;
+                    TimeScript.elapsedTime += addTimeCol;
                     SetFeedBackPos(other.transform.position);
                     ScoreFeedBack.scoreDiff = scoreCalc();
                     count++;
@@ -49,7 +49,7 @@ public class Collision : MonoBehaviour
                     soundEffect.PlaySE(2);
                     GameSystem.combo++;
                     GameSystem.score += scoreCalc();
-                    TimeScript.elapsedTime += 1;
+                    TimeScript.elapsedTime += addTimeCol;
                     SetFeedBackPos(other.transform.position);
                     ScoreFeedBack.scoreDiff = scoreCalc();
                     count++;
@@ -59,19 +59,11 @@ public class Collision : MonoBehaviour
             {
                GameSystem.score -= 5;
                GameSystem.combo = 0;
-                soundEffect.PlaySE(0);
-                Debug.Log(other.gameObject.name + "と衝突しました");
+               soundEffect.PlaySE(0);
+               Debug.Log(other.gameObject.name + "と衝突しました");
                Destroy(this.gameObject);
             }
             ScoreFeedBack.diffBeforeMulti = ScoreFeedBack.scoreDiff / buffMulti;
-
-            if (this.gameObject.name.Contains("Event")) 
-            {
-                EventSlot eventSlot = GameObject.Find("SlotItem").GetComponent<EventSlot>();
-                gameObject.GetComponent<SpriteRenderer>().enabled = false;
-                gameObject.GetComponent<CircleCollider2D>().enabled = false;
-                StartCoroutine(eventSlot.RollSlot(this.gameObject.name));
-            }
         }
         
     }
@@ -93,7 +85,15 @@ public class Collision : MonoBehaviour
             }
             GenerateStage.collisionPos[objNumber] = this.gameObject.transform.position.x;
         }
-        
+
+        if (this.gameObject.name.Contains("Event") && other.gameObject.CompareTag("Player"))
+        {
+            EventSlot eventSlot = GameObject.Find("SlotItem").GetComponent<EventSlot>();
+            gameObject.GetComponent<SpriteRenderer>().enabled = false;
+            gameObject.GetComponent<CircleCollider2D>().enabled = false;
+            StartCoroutine(eventSlot.RollSlot(this.gameObject.name));
+        }
+
     }
 
     float scoreCalc()
@@ -104,7 +104,7 @@ public class Collision : MonoBehaviour
         {
             buffMulti = 3.0f;
         }
-        return scoreBased  * (GameSystem.combo / 5) * (heightBonus) * buffMulti;
+        return GameSystem.scoreBase * (GameSystem.combo / GameSystem.scorePer) * (heightBonus) * buffMulti;
     }
 
     void SetFeedBackPos(Vector2 collisionPos)

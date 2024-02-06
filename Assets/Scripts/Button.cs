@@ -5,8 +5,8 @@ using UnityEngine.SceneManagement;
 
 public class Button : MonoBehaviour
 {
-    public void BackToTitle()
+    public void ReloadGame()
     {
-        SceneManager.LoadScene("Title");
+        SceneManager.LoadScene("Stagess");
     }
 }

@@ -8,8 +8,8 @@ public class GameSystem : MonoBehaviour
 {
     public Text scoreText, comboText, resultScoreTx, resultTimeTx, rankTx;
     public GameObject scoreTextGO, comboTextGO, player, resultPanel;
-    float scoreDisplay, lastCombo = 0;
-    public static float resultTime, resultScore , score, combo;
+    float scoreDisplay, lastCombo = 0, highScore;
+    public static float currentTime, resultScore , score, combo, scoreBase = 10, scorePer = 10;
     int stage1Goal = 5;
     string rank;
     public static string gameState = "Playing";
@@ -25,7 +25,7 @@ public class GameSystem : MonoBehaviour
         gameState = "Playing";
         score = 0;
         resultScore = 0;
-        resultTime = 0;
+        currentTime = 0;
         combo = 0;
         lastCombo = 0;
         player = GameObject.Find("Player");
@@ -42,7 +42,14 @@ public class GameSystem : MonoBehaviour
         ScoreDisplay();
         GameOver();
         Effect();
-        scoreText.text = "Score:" + String.Format("{0:####}", scoreDisplay);
+        if (playable)
+        {
+            scoreText.text = "Score:" + String.Format("{0:####}", scoreDisplay);
+        }
+        else
+        {
+            scoreText.text = "HighScore:" + String.Format("{0:####}", highScore);
+        }
         comboText.text = "x" + String.Format("{0:####}", combo);
     }
     void FixedUpdate()
@@ -59,12 +66,12 @@ public class GameSystem : MonoBehaviour
             player.transform.position = goalPos;
             int SECount1 = 0;
             int SECount2 = 0;
-            resultTimeTx.text = String.Format("{0:##.#}", resultTime);  //小数点第二位以下を非表示
+            resultTimeTx.text = String.Format("{0:##.#}", currentTime);  //小数点第二位以下を非表示
             resultScoreTx.text = String.Format("{0:####}", resultScore);  //整数のみ表示
-            while(resultTime < TimeScript.pastTime)
+            while(currentTime < TimeScript.pastTime)
             {
-                resultTime += TimeScript.pastTime / 1500;
-                if (resultTime >= TimeScript.pastTime)
+                currentTime += TimeScript.pastTime / 1500;
+                if (currentTime >= TimeScript.pastTime)
                 {
                     soundEffect.PlaySE(1);
                 }
@@ -86,6 +93,10 @@ public class GameSystem : MonoBehaviour
             }
             else { rankTx.text = "B"; }
             gameState = "Over";
+            if(score > highScore)
+            {
+                highScore = score;
+            }
         }
       
     }
@@ -124,7 +135,6 @@ public class GameSystem : MonoBehaviour
             StartCoroutine(SizeEffect(comboText, 150, 220));
             lastCombo = combo;
         }
-   
     }
     IEnumerator SizeEffect(Text text, int originalSize, int maxSize)
     {
@@ -167,6 +177,8 @@ public class GameSystem : MonoBehaviour
         }
         sizeEffectCoroutine = null;
     }
+
+  
 
 
 }
